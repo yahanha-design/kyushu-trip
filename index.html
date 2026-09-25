@@ -12,7 +12,6 @@
     <meta name="apple-mobile-web-app-title" content="九州秋旅">
     <meta name="theme-color" content="#0f172a">
     
-    <!-- Dynamic Canvas Kumamon PNG Icon Generator -->
     <script>
         (function generateKumamonPngIcon() {
             try {
@@ -117,9 +116,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;800;900&display=swap" rel="stylesheet">
     <!-- Phosphor Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
-    <!-- Leaflet CSS & JS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 
     <style>
         :root {
@@ -159,21 +155,6 @@
 
         .fade-enter-active, .fade-leave-active { transition: opacity 0.2s ease; }
         .fade-enter-from, .fade-leave-to { opacity: 0; }
-
-        #map { height: 100%; width: 100%; min-height: 380px; z-index: 1; }
-
-        .custom-map-pin {
-            background: #4338CA;
-            color: white;
-            border-radius: 9999px;
-            font-weight: 900;
-            font-size: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 2px solid white;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-        }
     </style>
 </head>
 <body class="flex flex-col items-center justify-center p-0 m-0 overflow-hidden">
@@ -223,7 +204,6 @@
                         <i class="ph-bold ph-translate text-xs"></i>
                     </a>
 
-                    <!-- Direct Google Image Search web link -->
                     <a href="https://images.google.com/" target="_blank" title="Google 圖片以圖搜圖" class="bg-slate-800 hover:bg-slate-700 text-white font-extrabold px-2 py-1.5 rounded-full text-xs flex items-center gap-1 btn-bounce border border-slate-700">
                         <i class="ph-bold ph-image text-xs"></i>
                     </a>
@@ -237,7 +217,6 @@
                 </div>
             </div>
 
-            <!-- Active Trip Code Bar -->
             <div @click="showShareModal = true" class="mt-2 bg-slate-800/90 hover:bg-slate-800 cursor-pointer rounded-xl px-2.5 py-1 flex items-center justify-between text-[11px] border border-slate-700/80 transition-colors">
                 <div class="flex items-center gap-1.5 truncate text-slate-300">
                     <i class="ph-bold ph-cloud-check text-emerald-400 text-xs"></i>
@@ -251,7 +230,6 @@
             </div>
         </header>
 
-        <!-- Date Navigation Bar -->
         <div v-if="currentTab === 'plan' || currentTab === 'map'" class="bg-white px-2.5 py-2 border-b border-slate-200 flex items-center gap-1.5 shrink-0 z-10 overflow-x-auto hide-scroll">
             <button v-for="(day, idx) in days" 
                     :key="idx" 
@@ -304,6 +282,12 @@
                         </div>
                     </div>
 
+                    <!-- Transport Pass Badge -->
+                    <div v-if="currentDay.transportPass" class="bg-sky-50 border border-sky-200 rounded-2xl p-3 flex items-center gap-2 text-xs font-black text-sky-900">
+                        <i class="ph-fill ph-ticket text-sky-600 text-base"></i>
+                        <span>交通券 / 方式：{{ currentDay.transportPass }}</span>
+                    </div>
+
                     <!-- Timeline Item List with Move Up/Down controls -->
                     <div class="relative pl-3 space-y-3.5 my-2 before:absolute before:left-[17px] before:top-4 before:bottom-4 before:w-1 before:bg-indigo-200/70 before:rounded-full">
                         <div v-for="(item, idx) in currentDay.items" :key="item.id || idx" class="relative group">
@@ -335,7 +319,7 @@
                                         </div>
                                     </div>
 
-                                    <!-- Action Controls: Move Up/Down + Nav + Edit + Delete -->
+                                    <!-- Action Controls -->
                                     <div class="flex flex-col gap-1.5 shrink-0">
                                         <button v-if="idx > 0" @click="moveItineraryItem(idx, -1)" title="向上挪動" class="w-7 h-7 flex items-center justify-center bg-indigo-50 text-indigo-700 hover:bg-indigo-100 rounded-lg btn-bounce border border-indigo-200">
                                             <i class="ph-bold ph-caret-up text-xs"></i>
@@ -372,7 +356,7 @@
                         <button @click="isNoteOpen = !isNoteOpen" class="w-full px-3.5 py-2.5 flex justify-between items-center text-left hover:bg-amber-100/50 btn-bounce">
                             <div class="flex items-center gap-2">
                                 <i class="ph-fill ph-note-pencil text-amber-700 text-base"></i>
-                                <span class="text-xs font-black text-amber-950">Day {{ currentDayIdx + 1 }} 當日備註</span>
+                                <span class="text-xs font-black text-amber-950">Day {{ currentDayIdx + 1 }} 補充備註與交通說明</span>
                                 <span v-if="currentDay.note" class="text-[10px] bg-amber-200 text-amber-900 font-black px-2 py-0.5 rounded-full border border-amber-300">
                                     有內容
                                 </span>
@@ -383,7 +367,7 @@
                         <div v-show="isNoteOpen" class="p-3 pt-0 border-t border-amber-200/60">
                             <textarea v-model="currentDay.note" 
                                       @change="saveDataToCloudAndLocal" 
-                                      rows="3" 
+                                      rows="4" 
                                       placeholder="點擊輸入此日備註事項..." 
                                       class="w-full mt-2 px-3 py-2 bg-white border border-amber-200 rounded-xl text-xs font-bold text-slate-900 focus:outline-none focus:border-indigo-500 resize-none shadow-2xs leading-relaxed"></textarea>
                         </div>
@@ -392,10 +376,51 @@
                 </div>
             </transition>
 
-            <!-- 2️⃣ 地圖視圖 (Map Tab) -->
+            <!-- 2️⃣ Google Maps Embed View with Daily Location List (Map Tab) -->
             <transition name="fade" mode="out-in">
-                <div v-show="currentTab === 'map'" class="h-full w-full rounded-2xl overflow-hidden shadow-xs border border-slate-200 relative min-h-[400px]">
-                    <div id="map"></div>
+                <div v-show="currentTab === 'map'" class="space-y-3">
+                    <div class="bg-white p-3 rounded-2xl shadow-2xs border border-slate-200">
+                        <div class="text-xs font-black text-slate-900 mb-2 flex items-center justify-between">
+                            <span class="flex items-center gap-1.5">
+                                <i class="ph-fill ph-map-pin text-red-500 text-sm"></i>
+                                <span>Day {{ currentDayIdx + 1 }} ({{ currentDay.city }}) 景點導航點</span>
+                            </span>
+                            <span class="text-[10px] text-slate-500 font-normal">點擊直接導航</span>
+                        </div>
+                        <div class="flex flex-wrap gap-1.5">
+                            <a v-for="(item, i) in currentDayLocations" :key="i"
+                               :href="getGoogleNavLink(item)" target="_blank"
+                               class="bg-indigo-50 hover:bg-indigo-100 text-indigo-900 px-3 py-1.5 rounded-xl border border-indigo-200 text-xs font-black flex items-center gap-1.5 btn-bounce">
+                                <i class="ph-fill ph-navigation-arrow text-indigo-600 text-xs"></i>
+                                <span>{{ item }}</span>
+                            </a>
+                            <div v-if="currentDayLocations.length === 0" class="text-xs text-slate-500 py-1">
+                                今日尚無指定景點位置
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="h-[380px] w-full rounded-2xl overflow-hidden shadow-xs border border-slate-200 relative flex flex-col bg-white">
+                        <div class="flex-1 w-full relative">
+                            <iframe 
+                                class="w-full h-full absolute inset-0 border-0"
+                                loading="lazy"
+                                allowfullscreen
+                                referrerpolicy="no-referrer-when-downgrade"
+                                :src="currentGoogleMapEmbedUrl">
+                            </iframe>
+                        </div>
+                        <div class="p-2.5 bg-slate-900 text-white shrink-0 flex items-center justify-between gap-2 border-t border-slate-800 text-xs">
+                            <div class="flex items-center gap-1.5 truncate">
+                                <i class="ph-fill ph-map-trifold text-indigo-400 text-sm shrink-0"></i>
+                                <span class="font-black truncate">Day {{ currentDayIdx + 1 }} 區域地圖</span>
+                            </div>
+                            <a :href="currentGoogleSearchUrl" target="_blank" class="bg-indigo-600 hover:bg-indigo-500 text-white font-black px-3 py-1.5 rounded-xl shrink-0 flex items-center gap-1 btn-bounce border border-indigo-400/40">
+                                <i class="ph-bold ph-arrow-square-out"></i>
+                                <span>Google 地圖開啟</span>
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </transition>
 
@@ -538,6 +563,32 @@
             <transition name="fade" mode="out-in">
                 <div v-if="currentTab === 'checklist'" class="space-y-4 relative min-h-full">
                     
+                    <!-- Google Translate Quick Access Card -->
+                    <div class="bg-gradient-to-br from-indigo-900 via-indigo-950 to-slate-900 text-white p-4 rounded-2xl shadow-md border border-indigo-800 space-y-3">
+                        <div class="flex items-center justify-between pb-2 border-b border-indigo-800/80">
+                            <div class="flex items-center gap-2">
+                                <div class="w-8 h-8 rounded-xl bg-indigo-600 flex items-center justify-center text-white">
+                                    <i class="ph-bold ph-translate text-base"></i>
+                                </div>
+                                <h3 class="text-xs font-black tracking-wide">Google 翻譯隨身通</h3>
+                            </div>
+                            <span class="text-[10px] bg-indigo-500/30 text-indigo-200 px-2 py-0.5 rounded-full border border-indigo-400/30 font-bold">即時對話/拍照</span>
+                        </div>
+                        <p class="text-[11px] text-indigo-200 leading-relaxed font-bold">
+                            點擊下方按鈕可快速開啟 Google 翻譯網頁，支援<b>相機拍照翻譯菜單</b>、<b>雙向語音對話</b>與文字互譯！
+                        </p>
+                        <div class="grid grid-cols-2 gap-2 pt-1">
+                            <a href="https://translate.google.com/?sl=ja&tl=zh-TW&op=translate" target="_blank" class="bg-indigo-600 hover:bg-indigo-500 text-white font-black py-2.5 px-3 rounded-xl text-xs flex items-center justify-center gap-1.5 btn-bounce border border-indigo-400/40 shadow-xs">
+                                <i class="ph-bold ph-chat-text text-sm"></i>
+                                <span>開啟文字翻譯</span>
+                            </a>
+                            <a href="https://translate.google.com/?sl=ja&tl=zh-TW&op=images" target="_blank" class="bg-white/10 hover:bg-white/20 text-white font-black py-2.5 px-3 rounded-xl text-xs flex items-center justify-center gap-1.5 btn-bounce border border-white/20 shadow-xs">
+                                <i class="ph-bold ph-camera text-sm"></i>
+                                <span>拍照翻譯菜單</span>
+                            </a>
+                        </div>
+                    </div>
+
                     <!-- Checklist Progress -->
                     <div class="bg-white p-4 rounded-2xl shadow-2xs border border-slate-200 space-y-3">
                         <div class="flex justify-between items-center">
@@ -605,7 +656,7 @@
                 <span class="text-[11px] font-black">行程表</span>
             </button>
 
-            <button @click="switchToMapTab()" :class="currentTab === 'map' ? 'text-indigo-600 scale-105' : 'text-slate-400'" class="flex flex-col items-center gap-0.5 btn-bounce">
+            <button @click="currentTab = 'map'" :class="currentTab === 'map' ? 'text-indigo-600 scale-105' : 'text-slate-400'" class="flex flex-col items-center gap-0.5 btn-bounce">
                 <i :class="currentTab === 'map' ? 'ph-fill ph-map-trifold' : 'ph-bold ph-map-trifold'" class="text-xl"></i>
                 <span class="text-[11px] font-black">地圖</span>
             </button>
@@ -850,66 +901,76 @@
             }
         }
 
+        // Updated exactly from user's image table data
         const defaultKyushuData = [
             {
-                date: '10/10 (六)', shortDate: '10/10', city: '大分', hotel: '大分JR九州Blossom飯店', note: '抵達機場後領取 JR Pass 實體票。',
+                date: '10/10 (六)', shortDate: '10/10', city: '大分', hotel: '大分JR飯店', transportPass: '大分機場巴士 / 氣墊船',
+                note: '1. JR站換 JR PASS\n2. 預約 10/13 大分 8:03 橫斷特急到阿蘇 10:08 指定座位',
                 items: [
-                    { id: '101', time: '12:00', type: 'flight', activity: '桃園 ➔ 大分 (15:00抵達)', location: '大分機場', itemNote: '提前 2 小時報到' },
-                    { id: '102', time: '16:00', type: 'transport', activity: '前往飯店 Check-in', location: '大分JR九州Blossom飯店', itemNote: '' }
+                    { id: '101', time: '12:00', type: 'flight', activity: '12:00 桃園 ➔ 大分 15:00', location: '大分機場', itemNote: '大分機場巴士到大分或搭乘氣墊 16:55 船到西大分港' }
                 ]
             },
             {
-                date: '10/11 (日)', shortDate: '10/11', city: '大分', hotel: '大分JR九州Blossom飯店', note: '昭和之町逛老街拍照。',
+                date: '10/11 (日)', shortDate: '10/11', city: '宇佐', hotel: '大分JR飯店', transportPass: 'JR PASS / 大分交通巴士',
+                note: '大分站搭特急 Sonic ➔ 宇佐站 (JR Pass 劃指定席)，宇佐站正門口轉乘「大分交通巴士」(往豐後高田方向)，車程約 10 分鐘。',
                 items: [
-                    { id: '201', time: '09:00', type: 'spot', activity: '大分出發 ➔ 豐後高田', location: '豐後高田 昭和之町', itemNote: '' },
-                    { id: '202', time: '13:30', type: 'spot', activity: '杵築城下町散策', location: '杵築城下町', itemNote: '' }
+                    { id: '201', time: '09:00', type: 'transport', activity: '大分站搭特急 Sonic ➔ 宇佐站', location: '宇佐站', itemNote: 'JR Pass 劃指定席' },
+                    { id: '202', time: '10:00', type: 'spot', activity: '豐後高田昭和城下町', location: '豐後高田', itemNote: '宇佐站正門口轉乘大分交通巴士(往豐後高田方向)，車程約10分鐘' }
                 ]
             },
             {
-                date: '10/12 (一)', shortDate: '10/12', city: '別府', hotel: '大分JR九州Blossom飯店', note: '別府地獄組合券可在第一個地獄購買。',
+                date: '10/12 (一)', shortDate: '10/12', city: '別府', hotel: '大分JR飯店', transportPass: 'JR PASS / 龜之井巴士',
+                note: '1. 別府纜車 09:00-17:30，費用：往返 1,800日圓 / 單程 1,200日圓\n2. 晚上寄大行李去熊本飯店',
                 items: [
-                    { id: '301', time: '09:00', type: 'spot', activity: '別府地獄巡禮', location: '海地獄', itemNote: '' },
-                    { id: '302', time: '14:00', type: 'spot', activity: '搭乘別府纜車', location: '別府高原駅', itemNote: '' }
+                    { id: '301', time: '08:00', type: 'spot', activity: '別府纜車 / 九州燒酒館', location: '別府纜車', itemNote: '09:00-17:30，往返 1,800日圓' },
+                    { id: '302', time: '13:00', type: 'spot', activity: '別府地獄巡禮', location: '別府地獄組合', itemNote: 'JR別府站(西口)搭乘龜之井巴士約20分，於「別府鐵輪站」下車' }
                 ]
             },
             {
-                date: '10/13 (二)', shortDate: '10/13', city: '阿蘇', hotel: '阿蘇民宿', note: '草千里風大記得帶防風外套。',
+                date: '10/13 (二)', shortDate: '10/13', city: '阿蘇', hotel: '阿蘇民宿', transportPass: 'JR PASS / 阿蘇巴士',
+                note: '阿蘇民宿 Check-in: 4:00 PM',
                 items: [
-                    { id: '401', time: '08:03', type: 'transport', activity: '大分橫斷特急前往阿蘇', location: '阿蘇車站', itemNote: '' },
-                    { id: '402', time: '10:30', type: 'spot', activity: '草千里漫步', location: '草千里', itemNote: '' }
+                    { id: '401', time: '08:03', type: 'transport', activity: '大分 8:03 橫斷特急到阿蘇 10:08', location: '阿蘇車站', itemNote: '已提前預約指定席' },
+                    { id: '402', time: '10:30', type: 'spot', activity: '搭阿蘇巴士到草千里 (吃午餐)、博物館、杵島岳', location: '草千里', itemNote: '' },
+                    { id: '403', time: '14:00', type: 'spot', activity: '阿蘇神社參拜', location: '阿蘇神社', itemNote: '阿蘇民宿 Check-in: 4:00 PM' }
                 ]
             },
             {
-                date: '10/14 (三)', shortDate: '10/14', city: '熊本', hotel: '相鐵GRAND FRESA 熊本', note: '包車行程準時出發。',
+                date: '10/14 (三)', shortDate: '10/14', city: '阿蘇/熊本', hotel: '熊本相鐵鐵飯', transportPass: 'JR PASS / 包車',
+                note: '帶一個空瓶子裝白川水源的水，買台川水罐醬油',
                 items: [
-                    { id: '501', time: '08:30', type: 'transport', activity: '前往白川水源', location: '白川水源', itemNote: '' },
-                    { id: '502', time: '13:56', type: 'transport', activity: '搭乘阿蘇男孩號前往熊本', location: '熊本車站', itemNote: '' }
+                    { id: '501', time: '08:30', type: 'spot', activity: '8:30 阿蘇民宿出發：白川水源、上色見熊野座神社', location: '白川水源', itemNote: '包車行程' },
+                    { id: '502', time: '12:30', type: 'food', activity: '高森田樂燒午餐', location: '高森田樂', itemNote: '' },
+                    { id: '503', time: '15:10', type: 'shop', activity: '阿蘇車站土產店採買', location: '阿蘇車站', itemNote: '' },
+                    { id: '504', time: '15:56', type: 'transport', activity: '15:56 阿蘇男孩觀光列車 ➔ 熊本', location: '熊本車站', itemNote: '' }
                 ]
             },
             {
-                date: '10/15 (四)', shortDate: '10/15', city: '久留米', hotel: '相鐵GRAND FRESA 熊本', note: '酒莊品酒。',
+                date: '10/15 (四)', shortDate: '10/15', city: '久留米', hotel: '熊本相鐵鐵飯', transportPass: 'JR PASS',
+                note: '搭乘 JR 前往久留米酒莊參觀',
                 items: [
-                    { id: '601', time: '09:00', type: 'transport', activity: '前往久留米', location: '久留米車站', itemNote: '' }
+                    { id: '601', time: '09:00', type: 'spot', activity: '久留米 / 巨峰葡萄酒廠酒莊', location: '久留米', itemNote: '使用 JR Pass' }
                 ]
             },
             {
-                date: '10/16 (五)', shortDate: '10/16', city: '山鹿', hotel: '相鐵GRAND FRESA 熊本', note: '山鹿老街。',
+                date: '10/16 (五)', shortDate: '10/16', city: '山鹿', hotel: '熊本相鐵鐵飯', transportPass: 'JR PASS / 產交巴士',
+                note: '1. 熊本櫻町巴士總站14號乘車處搭乘，約1小時15分鐘抵達山鹿溫泉八千代座入口或山鹿巴士中心。\n2. JR熊本站搭乘九州新幹線到JR新玉名站 (約10分鐘)，再轉乘九州產交巴士。\n3. 帶毛巾泡免費足湯。',
                 items: [
-                    { id: '701', time: '09:30', type: 'spot', activity: '前往山鹿老街', location: '山鹿老街', itemNote: '' }
+                    { id: '701', time: '09:00', type: 'spot', activity: '山鹿老街巡禮 (八千代座、燈籠民藝館、手烤米仙)', location: '八千代座', itemNote: '帶毛巾泡免費足湯' }
                 ]
             },
             {
-                date: '10/17 (六)', shortDate: '10/17', city: '熊本', hotel: '相鐵GRAND FRESA 熊本', note: '熊本城參觀。',
+                date: '10/17 (六)', shortDate: '10/17', city: '熊本', hotel: '熊本相鐵鐵飯', transportPass: '熊本市電 / 步行',
+                note: '熊本市區一日遊',
                 items: [
-                    { id: '801', time: '09:30', type: 'spot', activity: '參觀熊本城與城彩苑', location: '熊本城', itemNote: '' },
-                    { id: '802', time: '16:30', type: 'spot', activity: '尋找熊本熊部長', location: '熊本熊部長辦公室', itemNote: '' }
+                    { id: '801', time: '09:00', type: 'spot', activity: '熊本城 ➔ 城彩苑 ➔ 水前寺成趣園 ➔ 熊本熊部長辦公室 ➔ 熊本市役所 (魯夫像)', location: '熊本城', itemNote: '' }
                 ]
             },
             {
-                date: '10/18 (日)', shortDate: '10/18', city: '熊本', hotel: '溫馨的家', note: '藥妝補貨返台。',
+                date: '10/18 (日)', shortDate: '10/18', city: '熊本/機場', hotel: '熊本相鐵鐵飯', transportPass: '機場巴士 / 航班',
+                note: '星宇熊本 19:15 - 台中 20:45',
                 items: [
-                    { id: '901', time: '10:00', type: 'shop', activity: '藥妝大補貨', location: '下通商店街', itemNote: '' },
-                    { id: '902', time: '19:15', type: 'flight', activity: '星宇航空返台', location: '阿蘇熊本機場', itemNote: '' }
+                    { id: '901', time: '10:00', type: 'shop', activity: '市區補貨 ➔ 前往熊本機場', location: '熊本機場', itemNote: '星宇航空 19:15 ➔ 台灣台中 20:45' }
                 ]
             }
         ];
@@ -922,7 +983,7 @@
             { text: '日本 e-SIM 或網卡', category: '通訊', done: false },
             { text: '行動電源 & 充電線', category: '電子3C', done: false },
             { text: '保暖外套 (阿蘇山上較冷)', category: '衣物', done: false },
-            { text: '常用個人藥品 & 護唇膏', category: '個人用品', done: false }
+            { text: '常用個人藥品 & 空瓶 (裝白川水源水)', category: '個人用品', done: false }
         ];
 
         const defaultJapanesePhrases = [
@@ -935,16 +996,13 @@
             { zh: '謝謝！', ja: 'ありがとうございます', roma: 'Arigatou gozaimasu' }
         ];
 
-        const { createApp, ref, computed, watch, onMounted, nextTick } = Vue;
+        const { createApp, ref, computed, watch, onMounted } = Vue;
 
         createApp({
             setup() {
                 const currentTab = ref('plan');
                 const currentDayIdx = ref(0);
                 const isNoteOpen = ref(false);
-                let mapInstance = null;
-                let mapMarkers = [];
-                let mapPolyline = null;
 
                 const showShareModal = ref(false);
                 const copyNotice = ref('');
@@ -959,13 +1017,13 @@
                 const currentTripId = ref(getInitialTripId());
                 const tripInputCode = ref(currentTripId.value);
 
-                const days = ref(safeParseJSON('kyushu_days_v3', defaultKyushuData));
+                const days = ref(safeParseJSON('kyushu_days_v6', defaultKyushuData));
                 const exchangeRate = ref(parseFloat(localStorage.getItem('kyushu_exchange_rate')) || 0.215);
                 const calcJpyInput = ref(1000);
                 const members = ref(safeParseJSON('kyushu_members', ['小明', '小華', '阿妹']));
                 const expenses = ref(safeParseJSON('kyushu_expenses', [
-                    { id: 1, dayIdx: 4, title: '熊本馬肉料理晚餐', amount: 12000, paidBy: '小華', splitAmong: ['小明', '小華', '阿妹'], category: 'food' },
-                    { id: 2, dayIdx: 3, title: '阿蘇橫斷特急車票', amount: 6500, paidBy: '阿妹', splitAmong: ['小明', '小華'], category: 'transport' }
+                    { id: 1, dayIdx: 3, title: '阿蘇草千里午餐', amount: 12000, paidBy: '小華', splitAmong: ['小明', '小華', '阿妹'], category: 'food' },
+                    { id: 2, dayIdx: 2, title: '別府纜車往返門票', amount: 5400, paidBy: '阿妹', splitAmong: ['小明', '小華'], category: 'ticket' }
                 ]));
                 const packingList = ref(safeParseJSON('kyushu_packing_list', defaultPackingList));
                 const japanesePhrases = ref(defaultJapanesePhrases);
@@ -974,7 +1032,7 @@
 
                 const saveDataToCloudAndLocal = (broadcast = true) => {
                     try {
-                        localStorage.setItem('kyushu_days_v3', JSON.stringify(days.value));
+                        localStorage.setItem('kyushu_days_v6', JSON.stringify(days.value));
                         localStorage.setItem('kyushu_expenses', JSON.stringify(expenses.value));
                         localStorage.setItem('kyushu_members', JSON.stringify(members.value));
                         localStorage.setItem('kyushu_exchange_rate', exchangeRate.value.toString());
@@ -991,7 +1049,7 @@
 
                 syncChannel.onmessage = (event) => {
                     if (event.data && event.data.type === 'DATA_UPDATED' && event.data.tripId === currentTripId.value) {
-                        days.value = safeParseJSON('kyushu_days_v3', days.value);
+                        days.value = safeParseJSON('kyushu_days_v6', days.value);
                         expenses.value = safeParseJSON('kyushu_expenses', expenses.value);
                         members.value = safeParseJSON('kyushu_members', members.value);
                         exchangeRate.value = parseFloat(localStorage.getItem('kyushu_exchange_rate')) || 0.215;
@@ -999,7 +1057,6 @@
                     }
                 };
 
-                // Move itinerary item up/down
                 const moveItineraryItem = (idx, direction) => {
                     const items = days.value[currentDayIdx.value].items;
                     const targetIdx = idx + direction;
@@ -1048,6 +1105,7 @@
                     const d = currentDay.value;
                     let text = `🎌 【九州秋旅】Day ${currentDayIdx.value + 1} (${d.shortDate}) - ${d.city}\n`;
                     text += `🏨 住宿：${d.hotel || '未設定'}\n`;
+                    if (d.transportPass) text += `🚆 交通：${d.transportPass}\n`;
                     text += `------------------------\n`;
                     if (d.items && d.items.length > 0) {
                         d.items.forEach(item => {
@@ -1124,35 +1182,33 @@
                     return Math.round(jpy * exchangeRate.value);
                 });
 
-                const locationGeoMap = {
-                    '大分機場': [33.4794, 131.7347],
-                    '大分JR九州Blossom飯店': [33.2327, 131.6067],
-                    '豐後高田 昭和之町': [33.5562, 131.4428],
-                    '杵築城下町': [33.4158, 131.6186],
-                    '海地獄': [33.3156, 131.4681],
-                    '別府高原駅': [33.2801, 131.4339],
-                    '阿蘇車站': [32.9372, 131.0808],
-                    '草千里': [32.8850, 131.0520],
-                    '白川水源': [32.8256, 131.0772],
-                    '熊本車站': [32.7894, 130.6888],
-                    '熊本城': [32.8062, 130.7058],
-                    '熊本熊部長辦公室': [32.8018, 130.7107],
-                    '久留米車站': [33.3193, 130.5083],
-                    '山鹿老街': [33.0152, 130.6908],
-                    '下通商店街': [32.8002, 130.7082],
-                    '阿蘇熊本機場': [32.8372, 130.8550]
-                };
-
-                const cityGeoMap = {
-                    '大分': { lat: 33.2396, lng: 131.6093 },
-                    '別府': { lat: 33.2794, lng: 131.5011 },
-                    '阿蘇': { lat: 32.9558, lng: 131.0850 },
-                    '熊本': { lat: 32.8032, lng: 130.7079 },
-                    '久留米': { lat: 33.3193, lng: 130.5083 },
-                    '山鹿': { lat: 33.0142, lng: 130.6897 }
-                };
-
                 const currentDayWeather = ref(null);
+
+                // Computed unique locations for the current day for map navigation pills
+                const currentDayLocations = computed(() => {
+                    const day = currentDay.value;
+                    if (!day || !day.items) return [];
+                    const locs = [];
+                    day.items.forEach(i => {
+                        if (i.location && !locs.includes(i.location)) locs.push(i.location);
+                    });
+                    if (day.city && !locs.includes(day.city)) locs.push(day.city);
+                    return locs;
+                });
+
+                // Google Maps Embed & Search URLs computed based on current day city or primary item location
+                const currentGoogleMapEmbedUrl = computed(() => {
+                    const day = currentDay.value;
+                    const primaryLoc = day && day.items && day.items[0] && day.items[0].location ? day.items[0].location : (day ? day.city : '九州');
+                    const query = `九州 ${primaryLoc}`;
+                    return `https://maps.google.com/maps?q=${encodeURIComponent(query)}&t=&z=12&ie=UTF8&iwloc=&output=embed`;
+                });
+
+                const currentGoogleSearchUrl = computed(() => {
+                    const day = currentDay.value;
+                    const primaryLoc = day && day.items && day.items[0] && day.items[0].location ? day.items[0].location : (day ? day.city : '九州');
+                    return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent('九州 ' + primaryLoc)}`;
+                });
 
                 const getCategoryIcon = (type) => {
                     const icons = { spot: 'ph-fill ph-camera', food: 'ph-fill ph-cooking-pot', transport: 'ph-fill ph-train', flight: 'ph-fill ph-airplane-tilt', shop: 'ph-fill ph-shopping-bag' };
@@ -1235,8 +1291,16 @@
                 };
 
                 const fetchWeatherForCity = async (cityName) => {
-                    const coords = cityGeoMap[cityName];
-                    if (!coords) return;
+                    const geoCoords = {
+                        '大分': { lat: 33.2396, lng: 131.6093 },
+                        '宇佐': { lat: 33.5286, lng: 131.3533 },
+                        '別府': { lat: 33.2794, lng: 131.5011 },
+                        '阿蘇': { lat: 32.9558, lng: 131.0850 },
+                        '熊本': { lat: 32.8032, lng: 130.7079 },
+                        '久留米': { lat: 33.3193, lng: 130.5083 },
+                        '山鹿': { lat: 33.0142, lng: 130.6897 }
+                    };
+                    const coords = geoCoords[cityName] || geoCoords['熊本'];
                     try {
                         const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${coords.lat}&longitude=${coords.lng}&current_weather=true`);
                         const data = await res.json();
@@ -1246,49 +1310,6 @@
                     } catch (e) {
                         currentDayWeather.value = { temp: '22', icon: 'ph-fill ph-sun', desc: '舒適' };
                     }
-                };
-
-                const renderMapForCurrentDay = async () => {
-                    await nextTick();
-                    const container = document.getElementById('map');
-                    if (!container || typeof L === 'undefined') return;
-
-                    if (!mapInstance) {
-                        mapInstance = L.map('map', { zoomControl: false }).setView([32.8032, 130.7079], 9);
-                        L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', { attribution: '&copy; CARTO' }).addTo(mapInstance);
-                    }
-
-                    mapMarkers.forEach(m => m.remove());
-                    mapMarkers = [];
-                    if (mapPolyline) mapPolyline.remove();
-
-                    const points = [];
-                    const locs = currentDay.value.items.filter(i => i.location);
-
-                    locs.forEach((item, index) => {
-                        let coords = locationGeoMap[item.location];
-                        if (coords) {
-                            points.push(coords);
-                            const iconHtml = `<div class="custom-map-pin w-7 h-7">${index + 1}</div>`;
-                            const customIcon = L.divIcon({ html: iconHtml, className: '', iconSize: [28, 28], iconAnchor: [14, 14] });
-                            
-                            const marker = L.marker(coords, { icon: customIcon }).addTo(mapInstance).bindPopup(`<b>${index + 1}. ${item.activity}</b><br>${item.location}`);
-                            mapMarkers.push(marker);
-                        }
-                    });
-
-                    if (points.length > 0) {
-                        mapPolyline = L.polyline(points, { color: '#4338CA', weight: 4, dashArray: '6, 8' }).addTo(mapInstance);
-                        mapInstance.fitBounds(L.latLngBounds(points), { padding: [40, 40], maxZoom: 14 });
-                    }
-                };
-
-                const switchToMapTab = () => {
-                    currentTab.value = 'map';
-                    setTimeout(() => {
-                        if (mapInstance) mapInstance.invalidateSize();
-                        renderMapForCurrentDay();
-                    }, 150);
                 };
 
                 const getGoogleNavLink = (loc) => loc ? `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(loc)}` : '#';
@@ -1405,7 +1426,6 @@
 
                 watch(currentDayIdx, (newIdx) => {
                     fetchWeatherForCity(days.value[newIdx].city);
-                    if (currentTab.value === 'map') renderMapForCurrentDay();
                 });
 
                 onMounted(() => {
@@ -1421,7 +1441,7 @@
                     japanesePhrases, speakJapanese, copyLineItineraryText, exportBackupJson, importBackupJson,
                     getCategoryIcon, getCategoryName, getCategoryBgColor, getCategoryBadgeClass,
                     getGoogleNavLink, getExpenseCategoryIcon, moveItineraryItem,
-                    switchToMapTab, renderMapForCurrentDay,
+                    currentDayLocations, currentGoogleMapEmbedUrl, currentGoogleSearchUrl,
                     showItineraryModal, editingItineraryIdx, itineraryForm, openItineraryModal, saveItineraryItem, deleteItineraryItem, editDayHotel,
                     showExpenseModal, editingExpenseIdx, expenseForm, openExpenseModal, toggleExpenseMember, saveExpense, deleteExpense,
                     showMemberModal, newMemberName, editingMemberIndex, editMemberNameInput, openMemberModal, startEditMember, saveEditMember, addMember, removeMember,
