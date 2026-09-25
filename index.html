@@ -13,9 +13,103 @@
     <meta name="apple-mobile-web-app-title" content="九州秋季之旅">
     <meta name="theme-color" content="#0f172a">
     
-    <!-- 熊本熊 APP 圖示 Icon -->
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='20' cy='20' r='15' fill='%231a1a1a'/><circle cx='80' cy='20' r='15' fill='%231a1a1a'/><ellipse cx='50' cy='54' rx='44' ry='40' fill='%231a1a1a'/><ellipse cx='50' cy='64' rx='21' ry='16' fill='%23ffffff'/><ellipse cx='50' cy='55' rx='8' ry='6' fill='%231a1a1a'/><circle cx='18' cy='60' r='10' fill='%23dc2626'/><circle cx='82' cy='60' r='10' fill='%23dc2626'/></svg>">
-    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%230f172a'/><circle cx='30' cy='30' r='12' fill='%23ffffff'/><circle cx='70' cy='30' r='12' fill='%23ffffff'/><circle cx='30' cy='30' r='6' fill='%231a1a1a'/><circle cx='70' cy='30' r='6' fill='%231a1a1a'/><ellipse cx='50' cy='58' rx='38' ry='32' fill='%231a1a1a'/><ellipse cx='50' cy='66' rx='18' ry='13' fill='%23ffffff'/><ellipse cx='50' cy='58' rx='7' ry='5' fill='%231a1a1a'/><circle cx='22' cy='64' r='8' fill='%23dc2626'/><circle cx='78' cy='64' r='8' fill='%23dc2626'/></svg>">
+    <!-- 動態產生 iOS Safari / Android 必備的 PNG 格式 熊本熊 Icon -->
+    <script>
+        (function generateKumamonPngIcon() {
+            try {
+                const canvas = document.createElement('canvas');
+                canvas.width = 180;
+                canvas.height = 180;
+                const ctx = canvas.getContext('2d');
+                
+                // 背景：深灰藍底
+                ctx.fillStyle = '#0f172a';
+                ctx.fillRect(0, 0, 180, 180);
+                
+                // 外耳 (白)
+                ctx.fillStyle = '#ffffff';
+                ctx.beginPath(); ctx.arc(42, 42, 22, 0, Math.PI * 2); ctx.fill();
+                ctx.beginPath(); ctx.arc(138, 42, 22, 0, Math.PI * 2); ctx.fill();
+                
+                // 內耳 (黑)
+                ctx.fillStyle = '#1a1a1a';
+                ctx.beginPath(); ctx.arc(42, 42, 12, 0, Math.PI * 2); ctx.fill();
+                ctx.beginPath(); ctx.arc(138, 42, 12, 0, Math.PI * 2); ctx.fill();
+                
+                // 臉型 (黑)
+                ctx.fillStyle = '#1a1a1a';
+                ctx.beginPath();
+                ctx.ellipse(90, 102, 76, 68, 0, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // 嘴吻 (白)
+                ctx.fillStyle = '#ffffff';
+                ctx.beginPath();
+                ctx.ellipse(90, 116, 36, 26, 0, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // 鼻子 (黑)
+                ctx.fillStyle = '#1a1a1a';
+                ctx.beginPath();
+                ctx.ellipse(90, 102, 13, 9, 0, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // 眼睛外圈 (白)
+                ctx.fillStyle = '#ffffff';
+                ctx.beginPath(); ctx.arc(58, 76, 14, 0, Math.PI * 2); ctx.fill();
+                ctx.beginPath(); ctx.arc(122, 76, 14, 0, Math.PI * 2); ctx.fill();
+                
+                // 眼珠 (黑)
+                ctx.fillStyle = '#1a1a1a';
+                ctx.beginPath(); ctx.arc(58, 76, 6, 0, Math.PI * 2); ctx.fill();
+                ctx.beginPath(); ctx.arc(122, 76, 6, 0, Math.PI * 2); ctx.fill();
+                
+                // 腮紅 (紅)
+                ctx.fillStyle = '#dc2626';
+                ctx.beginPath(); ctx.arc(36, 112, 17, 0, Math.PI * 2); ctx.fill();
+                ctx.beginPath(); ctx.arc(144, 112, 17, 0, Math.PI * 2); ctx.fill();
+                
+                // 嘴巴 (笑臉弧線)
+                ctx.strokeStyle = '#1a1a1a';
+                ctx.lineWidth = 4;
+                ctx.lineCap = 'round';
+                ctx.beginPath();
+                ctx.arc(90, 110, 14, 0.15 * Math.PI, 0.85 * Math.PI);
+                ctx.stroke();
+
+                const pngDataUrl = canvas.toDataURL('image/png');
+                
+                // 寫入 apple-touch-icon (iOS Safari 必須要 PNG)
+                let appleLink = document.createElement('link');
+                appleLink.rel = 'apple-touch-icon';
+                appleLink.href = pngDataUrl;
+                document.head.appendChild(appleLink);
+
+                // 寫入 Favicon
+                let iconLink = document.createElement('link');
+                iconLink.rel = 'icon';
+                iconLink.type = 'image/png';
+                iconLink.href = pngDataUrl;
+                document.head.appendChild(iconLink);
+
+                // 動態生成 Web App Manifest，確保 Chrome / Android 安裝識別
+                const manifest = {
+                    name: "九州秋季之旅",
+                    short_name: "九州秋旅",
+                    start_url: "./",
+                    display: "standalone",
+                    background_color: "#0f172a",
+                    theme_color: "#0f172a",
+                    icons: [{ src: pngDataUrl, sizes: "180x180", type: "image/png" }]
+                };
+                const manifestBlob = new Blob([JSON.stringify(manifest)], {type: 'application/json'});
+                let manifestLink = document.createElement('link');
+                manifestLink.rel = 'manifest';
+                manifestLink.href = URL.createObjectURL(manifestBlob);
+                document.head.appendChild(manifestLink);
+            } catch(e) { console.error('Icon generation error:', e); }
+        })();
+    </script>
 
     <!-- Vue 3 Global Build -->
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
@@ -54,6 +148,12 @@
             user-select: none;
         }
         
+        /* 頂部導覽列 safe-area 下移補強，避免擠壓手機時間狀態列 */
+        .header-safe-top {
+            padding-top: max(44px, env(safe-area-inset-top, 44px)) !important;
+            padding-bottom: 12px;
+        }
+
         .hide-scroll::-webkit-scrollbar { display: none; }
         .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
 
@@ -70,8 +170,8 @@
 
     <div id="app" class="w-full h-full bg-slate-50 flex flex-col overflow-hidden relative border-0 md:max-w-md md:h-[95vh] md:rounded-3xl md:shadow-2xl md:border md:border-slate-800">
 
-        <!-- 頂部導覽列 -->
-        <header class="bg-slate-900 text-white shrink-0 z-20 px-3.5 py-3 shadow-md border-b border-slate-800 pt-safe">
+        <!-- 頂部導覽列 (加強 safe-top 距離) -->
+        <header class="bg-slate-900 text-white shrink-0 z-20 px-3.5 shadow-md border-b border-slate-800 header-safe-top">
             <div class="flex items-center justify-between gap-2">
                 <div class="flex items-center gap-2 min-w-0">
                     <div class="w-9 h-9 bg-slate-800 rounded-xl flex items-center justify-center shrink-0 shadow-inner border border-slate-700 p-0.5">
@@ -237,7 +337,7 @@
                             <i class="ph-duotone ph-calendar-plus text-4xl mb-2 text-indigo-400"></i>
                             <p class="text-sm font-black text-slate-800">今天還沒有安排行程喔！</p>
                             <button @click="openItineraryModal()" class="mt-3 bg-indigo-600 text-white font-black text-xs px-4 py-2 rounded-xl btn-bounce shadow-xs">
-                                + 立即新增第一個行程
+                                + 擴充新增行程
                             </button>
                         </div>
                     </div>
