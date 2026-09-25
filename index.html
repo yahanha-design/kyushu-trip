@@ -681,15 +681,15 @@
                             <div class="w-8 h-8 rounded-xl bg-indigo-100 text-indigo-700 flex items-center justify-center">
                                 <i class="ph-bold ph-share-network text-lg"></i>
                             </div>
-                            <h3 class="text-base font-black text-slate-900">同步與資料管理</h3>
+                            <h3 class="text-base font-black text-slate-900">同步設定與直接存檔</h3>
                         </div>
                         <button @click="showShareModal = false" class="w-7 h-7 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center font-black">✕</button>
                     </div>
 
                     <div class="space-y-3 text-xs">
                         <div class="bg-indigo-50 border border-indigo-200/80 p-3 rounded-2xl text-indigo-900 leading-relaxed font-bold">
-                            💡 <b>行程同步與分享：</b><br>
-                            輸入相同群組代碼即可在同瀏覽器/分頁雙向即時同步！或匯出文字快速傳送到 Line 群組。
+                            💡 <b>行程同步與即時存檔：</b><br>
+                            資料已自動保存在本機。您也可以點擊下方按鈕手動強制存檔，或複製專屬分享網址給旅伴！
                         </div>
 
                         <div>
@@ -703,6 +703,11 @@
                         </div>
 
                         <div class="pt-2 border-t border-slate-100 space-y-2">
+                            <button @click="manualSaveData" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-black rounded-xl shadow-xs flex items-center justify-center gap-2 btn-bounce">
+                                <i class="ph-bold ph-cloud-arrow-up text-base"></i>
+                                <span>立即手動存檔程式碼與資料</span>
+                            </button>
+
                             <button @click="copyShareLink" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-black rounded-xl shadow-xs flex items-center justify-center gap-2 btn-bounce">
                                 <i class="ph-bold ph-link text-base"></i>
                                 <span>複製專屬分享網址</span>
@@ -712,16 +717,6 @@
                                 <i class="ph-bold ph-chat-teardrop-text text-base"></i>
                                 <span>複製當日文字行程 (傳 Line)</span>
                             </button>
-
-                            <div class="grid grid-cols-2 gap-2 pt-1">
-                                <button @click="exportBackupJson" class="py-2 bg-slate-800 hover:bg-slate-900 text-white font-black rounded-xl text-xs flex items-center justify-center gap-1 btn-bounce">
-                                    <i class="ph-bold ph-download-simple"></i> 匯出備份 JSON
-                                </button>
-                                <label class="py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-300 font-black rounded-xl text-xs flex items-center justify-center gap-1 cursor-pointer btn-bounce">
-                                    <i class="ph-bold ph-upload-simple"></i> 匯入 JSON
-                                    <input type="file" accept=".json" @change="importBackupJson" class="hidden">
-                                </label>
-                            </div>
                         </div>
 
                         <div v-if="copyNotice" class="text-center font-black text-xs text-emerald-600 bg-emerald-50 py-1.5 rounded-lg border border-emerald-200">
@@ -1045,6 +1040,12 @@
                     } catch (e) {
                         console.error("Local storage save error:", e);
                     }
+                };
+
+                const manualSaveData = () => {
+                    saveDataToCloudAndLocal(true);
+                    copyNotice.value = "✅ 程式碼與行程資料已成功存檔！";
+                    setTimeout(() => { copyNotice.value = ''; }, 3000);
                 };
 
                 syncChannel.onmessage = (event) => {
@@ -1438,7 +1439,7 @@
                     currentDayWeather, filteredExpenses, getExpenseOriginalIndex,
                     exchangeRate, calcJpyInput, calcTwdResult, totalExpensesTwd, perPersonExpenseTwd,
                     setExchangeRate, packingList, checkedPackingCount, packingProgressPercent, togglePackingItem,
-                    japanesePhrases, speakJapanese, copyLineItineraryText, exportBackupJson, importBackupJson,
+                    japanesePhrases, speakJapanese, copyLineItineraryText, manualSaveData,
                     getCategoryIcon, getCategoryName, getCategoryBgColor, getCategoryBadgeClass,
                     getGoogleNavLink, getExpenseCategoryIcon, moveItineraryItem,
                     currentDayLocations, currentGoogleMapEmbedUrl, currentGoogleSearchUrl,
