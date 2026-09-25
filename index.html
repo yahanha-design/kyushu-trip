@@ -2,18 +2,17 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <!-- 修正手機版視口與縮放，確保強制滿版與防畫面抖動 -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>九州秋季之旅</title>
+    <title>九州秋季之旅 - 旅遊隨身助理</title>
     
-    <!-- PWA & 全螢幕 APP 設定 -->
+    <!-- PWA & Mobile Web App Meta Configuration -->
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="九州秋季之旅">
+    <meta name="apple-mobile-web-app-title" content="九州秋旅">
     <meta name="theme-color" content="#0f172a">
     
-    <!-- 動態產生 iOS Safari / Android 必備的 PNG 格式 熊本熊 Icon -->
+    <!-- Dynamic Canvas Kumamon PNG Icon Generator -->
     <script>
         (function generateKumamonPngIcon() {
             try {
@@ -22,54 +21,54 @@
                 canvas.height = 180;
                 const ctx = canvas.getContext('2d');
                 
-                // 背景：深灰藍底
+                // Background
                 ctx.fillStyle = '#0f172a';
                 ctx.fillRect(0, 0, 180, 180);
                 
-                // 外耳 (白)
+                // Outer Ears (White)
                 ctx.fillStyle = '#ffffff';
                 ctx.beginPath(); ctx.arc(42, 42, 22, 0, Math.PI * 2); ctx.fill();
                 ctx.beginPath(); ctx.arc(138, 42, 22, 0, Math.PI * 2); ctx.fill();
                 
-                // 內耳 (黑)
+                // Inner Ears (Black)
                 ctx.fillStyle = '#1a1a1a';
                 ctx.beginPath(); ctx.arc(42, 42, 12, 0, Math.PI * 2); ctx.fill();
                 ctx.beginPath(); ctx.arc(138, 42, 12, 0, Math.PI * 2); ctx.fill();
                 
-                // 臉型 (黑)
+                // Face (Black)
                 ctx.fillStyle = '#1a1a1a';
                 ctx.beginPath();
                 ctx.ellipse(90, 102, 76, 68, 0, 0, Math.PI * 2);
                 ctx.fill();
                 
-                // 嘴吻 (白)
+                // Snout (White)
                 ctx.fillStyle = '#ffffff';
                 ctx.beginPath();
                 ctx.ellipse(90, 116, 36, 26, 0, 0, Math.PI * 2);
                 ctx.fill();
                 
-                // 鼻子 (黑)
+                // Nose (Black)
                 ctx.fillStyle = '#1a1a1a';
                 ctx.beginPath();
                 ctx.ellipse(90, 102, 13, 9, 0, 0, Math.PI * 2);
                 ctx.fill();
                 
-                // 眼睛外圈 (白)
+                // Eyes Outer (White)
                 ctx.fillStyle = '#ffffff';
                 ctx.beginPath(); ctx.arc(58, 76, 14, 0, Math.PI * 2); ctx.fill();
                 ctx.beginPath(); ctx.arc(122, 76, 14, 0, Math.PI * 2); ctx.fill();
                 
-                // 眼珠 (黑)
+                // Eyes Inner (Black)
                 ctx.fillStyle = '#1a1a1a';
                 ctx.beginPath(); ctx.arc(58, 76, 6, 0, Math.PI * 2); ctx.fill();
                 ctx.beginPath(); ctx.arc(122, 76, 6, 0, Math.PI * 2); ctx.fill();
                 
-                // 腮紅 (紅)
+                // Cheeks (Red)
                 ctx.fillStyle = '#dc2626';
                 ctx.beginPath(); ctx.arc(36, 112, 17, 0, Math.PI * 2); ctx.fill();
                 ctx.beginPath(); ctx.arc(144, 112, 17, 0, Math.PI * 2); ctx.fill();
                 
-                // 嘴巴 (笑臉弧線)
+                // Mouth
                 ctx.strokeStyle = '#1a1a1a';
                 ctx.lineWidth = 4;
                 ctx.lineCap = 'round';
@@ -79,20 +78,17 @@
 
                 const pngDataUrl = canvas.toDataURL('image/png');
                 
-                // 寫入 apple-touch-icon (iOS Safari 必須要 PNG)
                 let appleLink = document.createElement('link');
                 appleLink.rel = 'apple-touch-icon';
                 appleLink.href = pngDataUrl;
                 document.head.appendChild(appleLink);
 
-                // 寫入 Favicon
                 let iconLink = document.createElement('link');
                 iconLink.rel = 'icon';
                 iconLink.type = 'image/png';
                 iconLink.href = pngDataUrl;
                 document.head.appendChild(iconLink);
 
-                // 動態生成 Web App Manifest，確保 Chrome / Android 安裝識別
                 const manifest = {
                     name: "九州秋季之旅",
                     short_name: "九州秋旅",
@@ -115,13 +111,13 @@
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts (繁體中文 Noto Sans TC) -->
+    <!-- Google Fonts Noto Sans TC -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;800;900&display=swap" rel="stylesheet">
     <!-- Phosphor Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
-    <!-- Leaflet CSS & JS (地圖功能) -->
+    <!-- Leaflet CSS & JS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 
@@ -129,9 +125,7 @@
         :root {
             --app-bg: #F8FAF8;
             --text-primary: #0F172A;
-            --text-secondary: #475569;
             --brand-primary: #4338CA;
-            --brand-accent: #D97706;
         }
         
         html, body {
@@ -148,10 +142,13 @@
             user-select: none;
         }
         
-        /* 頂部導覽列 safe-area 下移補強，避免擠壓手機時間狀態列 */
         .header-safe-top {
-            padding-top: max(44px, env(safe-area-inset-top, 44px)) !important;
-            padding-bottom: 12px;
+            padding-top: max(40px, env(safe-area-inset-top, 40px)) !important;
+            padding-bottom: 10px;
+        }
+
+        .pb-safe {
+            padding-bottom: max(16px, env(safe-area-inset-bottom, 16px)) !important;
         }
 
         .hide-scroll::-webkit-scrollbar { display: none; }
@@ -164,13 +161,26 @@
         .fade-enter-from, .fade-leave-to { opacity: 0; }
 
         #map { height: 100%; width: 100%; min-height: 380px; z-index: 1; }
+
+        .custom-map-pin {
+            background: #4338CA;
+            color: white;
+            border-radius: 9999px;
+            font-weight: 900;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid white;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
     </style>
 </head>
 <body class="flex flex-col items-center justify-center p-0 m-0 overflow-hidden">
 
     <div id="app" class="w-full h-full bg-slate-50 flex flex-col overflow-hidden relative border-0 md:max-w-md md:h-[95vh] md:rounded-3xl md:shadow-2xl md:border md:border-slate-800">
 
-        <!-- 頂部導覽列 (加強 safe-top 距離) -->
+        <!-- Top Header Navigation Bar -->
         <header class="bg-slate-900 text-white shrink-0 z-20 px-3.5 shadow-md border-b border-slate-800 header-safe-top">
             <div class="flex items-center justify-between gap-2">
                 <div class="flex items-center gap-2 min-w-0">
@@ -198,23 +208,26 @@
                         </div>
                         <p class="text-[10px] text-slate-400 font-medium flex items-center gap-1">
                             <span>10/10 - 10/18</span>
-                            <span v-if="isCloudConnected" class="inline-block w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" title="已開啟雲端同步"></span>
+                            <span class="inline-block w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" title="頁面已儲存"></span>
                         </p>
                     </div>
                 </div>
                 
                 <div class="flex items-center gap-1 shrink-0">
-                    <button @click="showShareModal = true" title="多人共用設定" class="bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold px-2.5 py-1.5 rounded-full text-xs flex items-center gap-1 btn-bounce border border-indigo-400/40 shadow-xs">
-                        <i class="ph-bold ph-users-three text-xs"></i>
+                    <button @click="showShareModal = true" title="多人共用與匯出" class="bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold px-2.5 py-1.5 rounded-full text-xs flex items-center gap-1 btn-bounce border border-indigo-400/40 shadow-xs">
+                        <i class="ph-bold ph-share-network text-xs"></i>
                         <span>共用</span>
                     </button>
 
                     <a href="https://translate.google.com/?sl=ja&tl=zh-TW" target="_blank" title="Google 翻譯" class="bg-slate-800 hover:bg-slate-700 text-white font-extrabold px-2 py-1.5 rounded-full text-xs flex items-center gap-1 btn-bounce border border-slate-700">
                         <i class="ph-bold ph-translate text-xs"></i>
                     </a>
-                    <a href="https://lens.google.com/" target="_blank" title="Google Lens" class="bg-slate-800 hover:bg-slate-700 text-white font-extrabold px-2 py-1.5 rounded-full text-xs flex items-center gap-1 btn-bounce border border-slate-700">
-                        <i class="ph-bold ph-camera text-xs"></i>
+
+                    <!-- Direct Google Image Search web link -->
+                    <a href="https://images.google.com/" target="_blank" title="Google 圖片以圖搜圖" class="bg-slate-800 hover:bg-slate-700 text-white font-extrabold px-2 py-1.5 rounded-full text-xs flex items-center gap-1 btn-bounce border border-slate-700">
+                        <i class="ph-bold ph-image text-xs"></i>
                     </a>
+
                     <button v-if="currentTab === 'plan'" @click="openItineraryModal()" class="bg-white/10 hover:bg-white/20 text-white font-black px-2 py-1.5 rounded-full text-xs flex items-center gap-1 btn-bounce border border-white/15">
                         <i class="ph-bold ph-plus text-xs"></i>
                     </button>
@@ -224,20 +237,21 @@
                 </div>
             </div>
 
+            <!-- Active Trip Code Bar -->
             <div @click="showShareModal = true" class="mt-2 bg-slate-800/90 hover:bg-slate-800 cursor-pointer rounded-xl px-2.5 py-1 flex items-center justify-between text-[11px] border border-slate-700/80 transition-colors">
                 <div class="flex items-center gap-1.5 truncate text-slate-300">
-                    <i class="ph-bold text-xs" :class="isCloudConnected ? 'ph-cloud-check text-emerald-400' : 'ph-cloud-slash text-amber-400'"></i>
+                    <i class="ph-bold ph-cloud-check text-emerald-400 text-xs"></i>
                     <span class="truncate">
-                        {{ isCloudConnected ? `共用中代碼：${currentTripId}` : '離線模式 (點此開啟多人共用)' }}
+                        群組代碼：<span class="font-bold text-white">{{ currentTripId }}</span>
                     </span>
                 </div>
                 <span class="text-[10px] font-bold text-indigo-300 shrink-0 flex items-center gap-0.5">
-                    設定代碼 <i class="ph-bold ph-caret-right"></i>
+                    同步設定 <i class="ph-bold ph-caret-right"></i>
                 </span>
             </div>
         </header>
 
-        <!-- 日期分頁 -->
+        <!-- Date Navigation Bar -->
         <div v-if="currentTab === 'plan' || currentTab === 'map'" class="bg-white px-2.5 py-2 border-b border-slate-200 flex items-center gap-1.5 shrink-0 z-10 overflow-x-auto hide-scroll">
             <button v-for="(day, idx) in days" 
                     :key="idx" 
@@ -252,10 +266,11 @@
 
         <main class="flex-1 overflow-y-auto relative hide-scroll px-4 pt-3.5 pb-20 bg-slate-100">
             
-            <!-- 1️⃣ 行程表視圖 -->
+            <!-- 1️⃣ 行程表視圖 (Itinerary Tab) -->
             <transition name="fade" mode="out-in">
                 <div v-if="currentTab === 'plan'" :key="currentDayIdx" class="space-y-3.5 relative min-h-full">
                     <div class="grid grid-cols-2 gap-2.5 relative z-10">
+                        <!-- Hotel Card -->
                         <div class="bg-white p-3 rounded-2xl border border-slate-200/90 shadow-2xs flex flex-col justify-between">
                             <div>
                                 <div class="flex justify-between items-center mb-1">
@@ -271,6 +286,7 @@
                             </div>
                         </div>
 
+                        <!-- Weather Widget Card -->
                         <div class="bg-white p-3 rounded-2xl border border-slate-200/90 shadow-2xs flex flex-col justify-between">
                             <div>
                                 <div class="text-[11px] font-black text-sky-800 flex items-center gap-1 mb-0.5">
@@ -288,6 +304,7 @@
                         </div>
                     </div>
 
+                    <!-- Timeline Item List with Move Up/Down controls -->
                     <div class="relative pl-3 space-y-3.5 my-2 before:absolute before:left-[17px] before:top-4 before:bottom-4 before:w-1 before:bg-indigo-200/70 before:rounded-full">
                         <div v-for="(item, idx) in currentDay.items" :key="item.id || idx" class="relative group">
                             <div class="bg-white p-4 rounded-2xl shadow-2xs border border-slate-200/90 relative z-10">
@@ -318,7 +335,15 @@
                                         </div>
                                     </div>
 
+                                    <!-- Action Controls: Move Up/Down + Nav + Edit + Delete -->
                                     <div class="flex flex-col gap-1.5 shrink-0">
+                                        <button v-if="idx > 0" @click="moveItineraryItem(idx, -1)" title="向上挪動" class="w-7 h-7 flex items-center justify-center bg-indigo-50 text-indigo-700 hover:bg-indigo-100 rounded-lg btn-bounce border border-indigo-200">
+                                            <i class="ph-bold ph-caret-up text-xs"></i>
+                                        </button>
+                                        <button v-if="idx < currentDay.items.length - 1" @click="moveItineraryItem(idx, 1)" title="向下挪動" class="w-7 h-7 flex items-center justify-center bg-indigo-50 text-indigo-700 hover:bg-indigo-100 rounded-lg btn-bounce border border-indigo-200">
+                                            <i class="ph-bold ph-caret-down text-xs"></i>
+                                        </button>
+
                                         <a v-if="item.location" :href="getGoogleNavLink(item.location)" target="_blank" title="Google 導航" class="w-7 h-7 flex items-center justify-center bg-sky-50 text-sky-700 hover:bg-sky-100 rounded-lg btn-bounce border border-sky-200">
                                             <i class="ph-bold ph-navigation-arrow text-sm"></i>
                                         </a>
@@ -337,11 +362,12 @@
                             <i class="ph-duotone ph-calendar-plus text-4xl mb-2 text-indigo-400"></i>
                             <p class="text-sm font-black text-slate-800">今天還沒有安排行程喔！</p>
                             <button @click="openItineraryModal()" class="mt-3 bg-indigo-600 text-white font-black text-xs px-4 py-2 rounded-xl btn-bounce shadow-xs">
-                                + 擴充新增行程
+                                + 新增行程
                             </button>
                         </div>
                     </div>
 
+                    <!-- Daily Notes Drawer -->
                     <div class="bg-amber-50 rounded-2xl border border-amber-200/90 shadow-2xs mt-3 overflow-hidden">
                         <button @click="isNoteOpen = !isNoteOpen" class="w-full px-3.5 py-2.5 flex justify-between items-center text-left hover:bg-amber-100/50 btn-bounce">
                             <div class="flex items-center gap-2">
@@ -366,14 +392,14 @@
                 </div>
             </transition>
 
-            <!-- 2️⃣ 地圖視圖 -->
+            <!-- 2️⃣ 地圖視圖 (Map Tab) -->
             <transition name="fade" mode="out-in">
                 <div v-show="currentTab === 'map'" class="h-full w-full rounded-2xl overflow-hidden shadow-xs border border-slate-200 relative min-h-[400px]">
                     <div id="map"></div>
                 </div>
             </transition>
 
-            <!-- 3️⃣ 分帳記帳視圖 -->
+            <!-- 3️⃣ 分帳記帳視圖 (Expense Tab) -->
             <transition name="fade" mode="out-in">
                 <div v-if="currentTab === 'expense'" class="space-y-4 relative min-h-full">
                     <div class="bg-gradient-to-br from-slate-900 via-slate-800 to-zinc-900 text-white rounded-2xl p-4 shadow-md border border-slate-700 space-y-3">
@@ -394,18 +420,19 @@
                             </button>
                         </div>
 
+                        <!-- Exchange Rate Settings Bar -->
                         <div class="bg-white/10 backdrop-blur-md rounded-xl p-2.5 border border-white/15 flex flex-wrap items-center justify-between gap-2 text-xs">
                             <div class="flex items-center gap-1.5 font-black text-amber-200">
                                 <i class="ph-bold ph-currency-jpy text-sm"></i>
-                                <span>換算匯率:</span>
+                                <span>匯率:</span>
                                 <span class="text-[11px] text-slate-300 font-normal">1 日圓 =</span>
                                 <input v-model.number="exchangeRate" @change="saveDataToCloudAndLocal" type="number" step="0.001" min="0.001" class="w-16 px-1.5 py-0.5 bg-slate-800 text-amber-300 font-black rounded border border-amber-400/50 text-center focus:outline-none focus:border-amber-400">
                                 <span class="text-[11px] text-slate-300 font-normal">台幣</span>
                             </div>
                             <div class="flex gap-1">
+                                <button @click="setExchangeRate(0.205)" class="px-2 py-0.5 rounded text-[10px] font-bold border btn-bounce" :class="exchangeRate === 0.205 ? 'bg-amber-500 text-slate-900 border-amber-400 font-black' : 'bg-white/10 text-slate-300 border-white/20'">0.205</button>
                                 <button @click="setExchangeRate(0.21)" class="px-2 py-0.5 rounded text-[10px] font-bold border btn-bounce" :class="exchangeRate === 0.21 ? 'bg-amber-500 text-slate-900 border-amber-400 font-black' : 'bg-white/10 text-slate-300 border-white/20'">0.21</button>
                                 <button @click="setExchangeRate(0.215)" class="px-2 py-0.5 rounded text-[10px] font-bold border btn-bounce" :class="exchangeRate === 0.215 ? 'bg-amber-500 text-slate-900 border-amber-400 font-black' : 'bg-white/10 text-slate-300 border-white/20'">0.215</button>
-                                <button @click="setExchangeRate(0.22)" class="px-2 py-0.5 rounded text-[10px] font-bold border btn-bounce" :class="exchangeRate === 0.22 ? 'bg-amber-500 text-slate-900 border-amber-400 font-black' : 'bg-white/10 text-slate-300 border-white/20'">0.22</button>
                             </div>
                         </div>
 
@@ -418,6 +445,7 @@
                         </div>
                     </div>
 
+                    <!-- Quick Calculator Bar -->
                     <div class="bg-indigo-900/90 text-white p-3 rounded-2xl shadow-2xs border border-indigo-700/80 flex items-center justify-between gap-2">
                         <div class="flex items-center gap-1.5 text-xs font-black text-indigo-200 shrink-0">
                             <i class="ph-bold ph-calculator text-indigo-300 text-base"></i>
@@ -435,10 +463,11 @@
                         </div>
                     </div>
 
+                    <!-- Settlement Recommendations Matrix -->
                     <div class="bg-white p-3.5 rounded-2xl shadow-2xs border border-slate-200 space-y-2">
                         <div class="flex items-center gap-1.5 pb-2 border-b border-slate-100">
                             <i class="ph-fill ph-arrows-left-right text-amber-600 text-sm"></i>
-                            <h3 class="text-xs font-black text-slate-900">平攤結算建議</h3>
+                            <h3 class="text-xs font-black text-slate-900">平攤結算建議 (Who owes Whom)</h3>
                         </div>
                         <div v-if="settlements.length > 0" class="space-y-1.5">
                             <div v-for="(s, idx) in settlements" :key="idx" class="flex items-center justify-between bg-amber-50/70 p-2.5 rounded-xl border border-amber-200/60 text-xs font-black text-slate-800">
@@ -454,10 +483,11 @@
                             </div>
                         </div>
                         <div v-else class="text-center py-2 text-xs text-slate-500 font-bold">
-                            🎉 目前帳目已完全平衡！
+                            🎉 目前帳目完全平衡！
                         </div>
                     </div>
 
+                    <!-- Expense Item List -->
                     <div class="space-y-2">
                         <div class="flex justify-between items-center px-1">
                             <h3 class="text-xs font-black text-slate-700 flex items-center gap-1">
@@ -504,73 +534,119 @@
                 </div>
             </transition>
 
+            <!-- 4️⃣ 準備與會話視圖 (Checklist & Japanese Phrases) -->
+            <transition name="fade" mode="out-in">
+                <div v-if="currentTab === 'checklist'" class="space-y-4 relative min-h-full">
+                    
+                    <!-- Checklist Progress -->
+                    <div class="bg-white p-4 rounded-2xl shadow-2xs border border-slate-200 space-y-3">
+                        <div class="flex justify-between items-center">
+                            <h3 class="text-xs font-black text-slate-900 flex items-center gap-1.5">
+                                <i class="ph-fill ph-check-square-offset text-indigo-600 text-base"></i>
+                                <span>行前準備與必帶清單</span>
+                            </h3>
+                            <span class="text-xs font-black text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-full border border-indigo-200">
+                                {{ checkedPackingCount }} / {{ packingList.length }}
+                            </span>
+                        </div>
+
+                        <div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
+                            <div class="bg-indigo-600 h-2 rounded-full transition-all duration-300" :style="{ width: packingProgressPercent + '%' }"></div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
+                            <div v-for="(item, idx) in packingList" :key="idx" 
+                                 @click="togglePackingItem(idx)"
+                                 :class="item.done ? 'bg-indigo-50/80 border-indigo-200 text-indigo-950 line-through' : 'bg-slate-50 border-slate-200 text-slate-800'"
+                                 class="p-2.5 rounded-xl border text-xs font-bold flex items-center justify-between cursor-pointer btn-bounce">
+                                <span class="flex items-center gap-2">
+                                    <i :class="item.done ? 'ph-fill ph-check-circle text-indigo-600' : 'ph-bold ph-circle text-slate-400'" class="text-base"></i>
+                                    <span>{{ item.text }}</span>
+                                </span>
+                                <span class="text-[10px] text-slate-500 font-normal bg-white/80 px-1.5 py-0.5 rounded border border-slate-200">{{ item.category }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Japanese Travel Voice Phrases -->
+                    <div class="bg-white p-4 rounded-2xl shadow-2xs border border-slate-200 space-y-3">
+                        <div class="flex justify-between items-center pb-2 border-b border-slate-100">
+                            <h3 class="text-xs font-black text-slate-900 flex items-center gap-1.5">
+                                <i class="ph-fill ph-speaker-high text-amber-600 text-base"></i>
+                                <span>實用旅遊日語 (點擊語音播放)</span>
+                            </h3>
+                        </div>
+
+                        <div class="space-y-2">
+                            <div v-for="(p, idx) in japanesePhrases" :key="idx" 
+                                 @click="speakJapanese(p.ja)"
+                                 class="bg-amber-50/60 hover:bg-amber-100/70 border border-amber-200/80 p-3 rounded-2xl flex items-center justify-between cursor-pointer btn-bounce transition-colors">
+                                <div>
+                                    <div class="text-xs font-black text-slate-900">{{ p.zh }}</div>
+                                    <div class="text-xs font-bold text-amber-900 mt-0.5">{{ p.ja }}</div>
+                                    <div class="text-[10px] text-slate-500 mt-0.5 font-medium">{{ p.roma }}</div>
+                                </div>
+                                <div class="w-8 h-8 rounded-xl bg-amber-500 text-white flex items-center justify-center shrink-0 shadow-xs">
+                                    <i class="ph-fill ph-speaker-high text-base"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </transition>
+
         </main>
 
-        <!-- 底部導覽 -->
-        <nav class="absolute bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-200 px-4 py-2 flex justify-around items-center z-30 pb-safe">
+        <!-- Bottom Navigation Bar -->
+        <nav class="absolute bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-200 px-3 py-2 flex justify-around items-center z-30 pb-safe">
             <button @click="currentTab = 'plan'" :class="currentTab === 'plan' ? 'text-indigo-600 scale-105' : 'text-slate-400'" class="flex flex-col items-center gap-0.5 btn-bounce">
                 <i :class="currentTab === 'plan' ? 'ph-fill ph-calendar-check' : 'ph-bold ph-calendar'" class="text-xl"></i>
-                <span class="text-[11px] font-black flex items-center gap-1">
-                    <span class="text-xs">🎌</span> 行程表
-                </span>
+                <span class="text-[11px] font-black">行程表</span>
             </button>
 
             <button @click="switchToMapTab()" :class="currentTab === 'map' ? 'text-indigo-600 scale-105' : 'text-slate-400'" class="flex flex-col items-center gap-0.5 btn-bounce">
                 <i :class="currentTab === 'map' ? 'ph-fill ph-map-trifold' : 'ph-bold ph-map-trifold'" class="text-xl"></i>
-                <span class="text-[11px] font-black flex items-center gap-1">
-                    <span class="text-xs">🗾</span> 地圖導航
-                </span>
+                <span class="text-[11px] font-black">地圖</span>
             </button>
 
             <button @click="currentTab = 'expense'" :class="currentTab === 'expense' ? 'text-amber-600 scale-105' : 'text-slate-400'" class="flex flex-col items-center gap-0.5 btn-bounce">
                 <i :class="currentTab === 'expense' ? 'ph-fill ph-wallet' : 'ph-bold ph-wallet'" class="text-xl"></i>
-                <span class="text-[11px] font-black flex items-center gap-1">
-                    <span class="text-xs">💴</span> 分帳記帳
-                </span>
+                <span class="text-[11px] font-black">記帳</span>
             </button>
 
-            <div class="hidden sm:flex items-center gap-1 bg-rose-50 border border-rose-200 px-2 py-1 rounded-full shrink-0">
-                <div class="w-4 h-4 rounded-full overflow-hidden shrink-0">
-                    <svg viewBox="0 0 100 100" class="w-full h-full">
-                        <circle cx="20" cy="20" r="15" fill="#1a1a1a" />
-                        <circle cx="80" cy="20" r="15" fill="#1a1a1a" />
-                        <ellipse cx="50" cy="54" rx="44" ry="40" fill="#1a1a1a" />
-                        <ellipse cx="50" cy="64" rx="21" ry="16" fill="#ffffff" />
-                        <ellipse cx="50" cy="55" rx="8" ry="6" fill="#1a1a1a" />
-                        <circle cx="18" cy="60" r="10" fill="#dc2626" />
-                        <circle cx="82" cy="60" r="10" fill="#dc2626" />
-                    </svg>
-                </div>
-                <span class="text-[10px] font-black text-rose-800">九州秋旅</span>
-            </div>
+            <button @click="currentTab = 'checklist'" :class="currentTab === 'checklist' ? 'text-emerald-600 scale-105' : 'text-slate-400'" class="flex flex-col items-center gap-0.5 btn-bounce">
+                <i :class="currentTab === 'checklist' ? 'ph-fill ph-list-checks' : 'ph-bold ph-list-checks'" class="text-xl"></i>
+                <span class="text-[11px] font-black">準備/日語</span>
+            </button>
         </nav>
 
-        <!-- 🌐 雲端共用 Modal -->
+        <!-- 🌐 Cloud Share & Export Modal -->
         <transition name="fade">
             <div v-if="showShareModal" class="absolute inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-                <div class="bg-white w-full max-w-sm rounded-3xl p-5 space-y-4 shadow-2xl border border-slate-200">
+                <div class="bg-white w-full max-w-sm rounded-3xl p-5 space-y-4 shadow-2xl border border-slate-200 max-h-[85vh] overflow-y-auto hide-scroll">
                     <div class="flex justify-between items-center pb-2 border-b border-slate-200">
                         <div class="flex items-center gap-2">
                             <div class="w-8 h-8 rounded-xl bg-indigo-100 text-indigo-700 flex items-center justify-center">
-                                <i class="ph-bold ph-users-three text-lg"></i>
+                                <i class="ph-bold ph-share-network text-lg"></i>
                             </div>
-                            <h3 class="text-base font-black text-slate-900">多人即時共用行程</h3>
+                            <h3 class="text-base font-black text-slate-900">同步與資料管理</h3>
                         </div>
                         <button @click="showShareModal = false" class="w-7 h-7 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center font-black">✕</button>
                     </div>
 
                     <div class="space-y-3 text-xs">
                         <div class="bg-indigo-50 border border-indigo-200/80 p-3 rounded-2xl text-indigo-900 leading-relaxed font-bold">
-                            💡 <b>如何與旅伴共用？</b><br>
-                            只要將「<b>共用代碼</b>」給旅伴輸入，或分享「<b>邀請連結</b>」，所有人就能同步查看行程與消費！
+                            💡 <b>行程同步與分享：</b><br>
+                            輸入相同群組代碼即可在同瀏覽器/分頁雙向即時同步！或匯出文字快速傳送到 Line 群組。
                         </div>
 
                         <div>
-                            <label class="font-black text-slate-800 block mb-1">您的當前共用代碼 (Trip ID)</label>
+                            <label class="font-black text-slate-800 block mb-1">您的當前群組代碼 (Trip ID)</label>
                             <div class="flex gap-2">
                                 <input v-model="tripInputCode" type="text" placeholder="例如：kyushu-2026" class="flex-1 px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl font-black text-slate-800 focus:outline-none focus:border-indigo-600">
                                 <button @click="switchTripId(tripInputCode)" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3.5 py-2 rounded-xl font-black btn-bounce shrink-0">
-                                    切換代碼
+                                    切換
                                 </button>
                             </div>
                         </div>
@@ -578,8 +654,23 @@
                         <div class="pt-2 border-t border-slate-100 space-y-2">
                             <button @click="copyShareLink" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-black rounded-xl shadow-xs flex items-center justify-center gap-2 btn-bounce">
                                 <i class="ph-bold ph-link text-base"></i>
-                                <span>複製專屬共用連結</span>
+                                <span>複製專屬分享網址</span>
                             </button>
+
+                            <button @click="copyLineItineraryText" class="w-full py-2.5 bg-green-600 hover:bg-green-700 text-white font-black rounded-xl shadow-xs flex items-center justify-center gap-2 btn-bounce">
+                                <i class="ph-bold ph-chat-teardrop-text text-base"></i>
+                                <span>複製當日文字行程 (傳 Line)</span>
+                            </button>
+
+                            <div class="grid grid-cols-2 gap-2 pt-1">
+                                <button @click="exportBackupJson" class="py-2 bg-slate-800 hover:bg-slate-900 text-white font-black rounded-xl text-xs flex items-center justify-center gap-1 btn-bounce">
+                                    <i class="ph-bold ph-download-simple"></i> 匯出備份 JSON
+                                </button>
+                                <label class="py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-300 font-black rounded-xl text-xs flex items-center justify-center gap-1 cursor-pointer btn-bounce">
+                                    <i class="ph-bold ph-upload-simple"></i> 匯入 JSON
+                                    <input type="file" accept=".json" @change="importBackupJson" class="hidden">
+                                </label>
+                            </div>
                         </div>
 
                         <div v-if="copyNotice" class="text-center font-black text-xs text-emerald-600 bg-emerald-50 py-1.5 rounded-lg border border-emerald-200">
@@ -590,7 +681,7 @@
             </div>
         </transition>
 
-        <!-- 📝 行程 Modal -->
+        <!-- 📝 Add/Edit Itinerary Modal -->
         <transition name="fade">
             <div v-if="showItineraryModal" class="absolute inset-0 bg-slate-900/50 backdrop-blur-xs z-50 flex items-end justify-center">
                 <div class="bg-white w-full rounded-t-3xl p-5 space-y-3 max-h-[85vh] overflow-y-auto hide-scroll shadow-2xl border-t border-slate-200">
@@ -624,7 +715,7 @@
                         </div>
 
                         <div>
-                            <label class="text-slate-700">地點名稱 (導航用)</label>
+                            <label class="text-slate-700">地點名稱 (導航地圖用)</label>
                             <input v-model="itineraryForm.location" type="text" placeholder="例如：熊本城" class="w-full mt-1 p-2.5 bg-slate-50 border border-slate-300 rounded-xl">
                         </div>
 
@@ -641,7 +732,7 @@
             </div>
         </transition>
 
-        <!-- 💸 記帳 Modal -->
+        <!-- 💸 Add/Edit Expense Modal -->
         <transition name="fade">
             <div v-if="showExpenseModal" class="absolute inset-0 bg-slate-900/50 backdrop-blur-xs z-50 flex items-end justify-center">
                 <div class="bg-white w-full rounded-t-3xl p-5 space-y-3 max-h-[85vh] overflow-y-auto hide-scroll shadow-2xl border-t border-slate-200">
@@ -713,7 +804,7 @@
             </div>
         </transition>
 
-        <!-- 👥 成員 Modal -->
+        <!-- 👥 Member Management Modal -->
         <transition name="fade">
             <div v-if="showMemberModal" class="absolute inset-0 bg-slate-900/50 backdrop-blur-xs z-50 flex items-center justify-center p-4">
                 <div class="bg-white w-full max-w-xs rounded-3xl p-5 space-y-3 shadow-2xl border border-slate-200">
@@ -749,7 +840,6 @@
     </div>
 
     <script>
-        // 安全 LocalStorage 讀取工具，防止資料毀損導致畫面空白
         function safeParseJSON(key, fallback) {
             try {
                 const item = localStorage.getItem(key);
@@ -824,6 +914,27 @@
             }
         ];
 
+        const defaultPackingList = [
+            { text: '護照 (確認6個月以上有效期)', category: '重要證件', done: false },
+            { text: '日本 Visit Japan Web 填寫 completed', category: '重要證件', done: false },
+            { text: 'JR Kyushu Pass 兌換券/實體票', category: '交通票卷', done: false },
+            { text: '日圓現金 & 信用卡 (海外高回饋)', category: '金錢', done: false },
+            { text: '日本 e-SIM 或網卡', category: '通訊', done: false },
+            { text: '行動電源 & 充電線', category: '電子3C', done: false },
+            { text: '保暖外套 (阿蘇山上較冷)', category: '衣物', done: false },
+            { text: '常用個人藥品 & 護唇膏', category: '個人用品', done: false }
+        ];
+
+        const defaultJapanesePhrases = [
+            { zh: '不好意思 / 請問...', ja: 'すみません', roma: 'Sumimasen' },
+            { zh: '請給我這個', ja: 'これをください', roma: 'Kore o kudasai' },
+            { zh: '請問多少錢？', ja: 'いくらですか？', roma: 'Ikura desu ka?' },
+            { zh: '我要結帳', ja: 'お会計をお願いします', roma: 'O-kaikei o onegai shimasu' },
+            { zh: '可以辦理免稅嗎？', ja: '免税できますか？', roma: 'Menzei dekimasu ka?' },
+            { zh: '洗手間在哪裡？', ja: 'お手洗いはどこですか？', roma: 'Oterai wa doko desu ka?' },
+            { zh: '謝謝！', ja: 'ありがとうございます', roma: 'Arigatou gozaimasu' }
+        ];
+
         const { createApp, ref, computed, watch, onMounted, nextTick } = Vue;
 
         createApp({
@@ -836,7 +947,6 @@
                 let mapPolyline = null;
 
                 const showShareModal = ref(false);
-                const isCloudConnected = ref(false);
                 const copyNotice = ref('');
                 
                 const getInitialTripId = () => {
@@ -857,17 +967,49 @@
                     { id: 1, dayIdx: 4, title: '熊本馬肉料理晚餐', amount: 12000, paidBy: '小華', splitAmong: ['小明', '小華', '阿妹'], category: 'food' },
                     { id: 2, dayIdx: 3, title: '阿蘇橫斷特急車票', amount: 6500, paidBy: '阿妹', splitAmong: ['小明', '小華'], category: 'transport' }
                 ]));
+                const packingList = ref(safeParseJSON('kyushu_packing_list', defaultPackingList));
+                const japanesePhrases = ref(defaultJapanesePhrases);
 
-                const saveDataToCloudAndLocal = () => {
+                const syncChannel = new BroadcastChannel('kyushu_trip_channel');
+
+                const saveDataToCloudAndLocal = (broadcast = true) => {
                     try {
                         localStorage.setItem('kyushu_days_v3', JSON.stringify(days.value));
                         localStorage.setItem('kyushu_expenses', JSON.stringify(expenses.value));
                         localStorage.setItem('kyushu_members', JSON.stringify(members.value));
                         localStorage.setItem('kyushu_exchange_rate', exchangeRate.value.toString());
+                        localStorage.setItem('kyushu_packing_list', JSON.stringify(packingList.value));
                         localStorage.setItem('kyushu_current_trip_id', currentTripId.value);
+
+                        if (broadcast) {
+                            syncChannel.postMessage({ type: 'DATA_UPDATED', tripId: currentTripId.value });
+                        }
                     } catch (e) {
                         console.error("Local storage save error:", e);
                     }
+                };
+
+                syncChannel.onmessage = (event) => {
+                    if (event.data && event.data.type === 'DATA_UPDATED' && event.data.tripId === currentTripId.value) {
+                        days.value = safeParseJSON('kyushu_days_v3', days.value);
+                        expenses.value = safeParseJSON('kyushu_expenses', expenses.value);
+                        members.value = safeParseJSON('kyushu_members', members.value);
+                        exchangeRate.value = parseFloat(localStorage.getItem('kyushu_exchange_rate')) || 0.215;
+                        packingList.value = safeParseJSON('kyushu_packing_list', packingList.value);
+                    }
+                };
+
+                // Move itinerary item up/down
+                const moveItineraryItem = (idx, direction) => {
+                    const items = days.value[currentDayIdx.value].items;
+                    const targetIdx = idx + direction;
+                    if (targetIdx < 0 || targetIdx >= items.length) return;
+                    
+                    const temp = items[idx];
+                    items[idx] = items[targetIdx];
+                    items[targetIdx] = temp;
+
+                    saveDataToCloudAndLocal();
                 };
 
                 const switchTripId = (newCode) => {
@@ -893,13 +1035,83 @@
                     textArea.select();
                     try {
                         document.execCommand('copy');
-                        copyNotice.value = "✅ 專屬共用連結已複製！";
+                        copyNotice.value = "✅ 分享連結已複製！";
                     } catch (err) {
                         copyNotice.value = `連結：${link}`;
                     }
                     document.body.removeChild(textArea);
 
                     setTimeout(() => { copyNotice.value = ''; }, 4000);
+                };
+
+                const copyLineItineraryText = () => {
+                    const d = currentDay.value;
+                    let text = `🎌 【九州秋旅】Day ${currentDayIdx.value + 1} (${d.shortDate}) - ${d.city}\n`;
+                    text += `🏨 住宿：${d.hotel || '未設定'}\n`;
+                    text += `------------------------\n`;
+                    if (d.items && d.items.length > 0) {
+                        d.items.forEach(item => {
+                            text += `⏰ ${item.time || '未定'} | ${item.activity}`;
+                            if (item.location) text += `📍 (${item.location})`;
+                            text += `\n`;
+                        });
+                    } else {
+                        text += `尚未安排明細\n`;
+                    }
+                    if (d.note) text += `📝 備註：${d.note}\n`;
+
+                    const textArea = document.createElement("textarea");
+                    textArea.value = text;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    try {
+                        document.execCommand('copy');
+                        copyNotice.value = "✅ 行程已複製成 Line 格式！";
+                    } catch (err) {
+                        copyNotice.value = "複製失敗，請手動複製";
+                    }
+                    document.body.removeChild(textArea);
+                    setTimeout(() => { copyNotice.value = ''; }, 4000);
+                };
+
+                const exportBackupJson = () => {
+                    const backupData = {
+                        tripId: currentTripId.value,
+                        days: days.value,
+                        expenses: expenses.value,
+                        members: members.value,
+                        exchangeRate: exchangeRate.value,
+                        packingList: packingList.value
+                    };
+                    const blob = new Blob([JSON.stringify(backupData, null, 2)], { type: 'application/json' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `kyushu-trip-${currentTripId.value}.json`;
+                    a.click();
+                    URL.revokeObjectURL(url);
+                };
+
+                const importBackupJson = (event) => {
+                    const file = event.target.files[0];
+                    if (!file) return;
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        try {
+                            const data = JSON.parse(e.target.result);
+                            if (data.days) days.value = data.days;
+                            if (data.expenses) expenses.value = data.expenses;
+                            if (data.members) members.value = data.members;
+                            if (data.exchangeRate) exchangeRate.value = data.exchangeRate;
+                            if (data.packingList) packingList.value = data.packingList;
+                            saveDataToCloudAndLocal();
+                            copyNotice.value = "✅ JSON 資料匯入成功！";
+                        } catch (err) {
+                            copyNotice.value = "❌ 檔案格式錯誤！";
+                        }
+                        setTimeout(() => { copyNotice.value = ''; }, 4000);
+                    };
+                    reader.readAsText(file);
                 };
 
                 const setExchangeRate = (rate) => {
@@ -1004,6 +1216,24 @@
 
                 const currentDay = computed(() => days.value[currentDayIdx.value] || { items: [], date: '', city: '', note: '' });
 
+                const checkedPackingCount = computed(() => packingList.value.filter(i => i.done).length);
+                const packingProgressPercent = computed(() => packingList.value.length ? Math.round((checkedPackingCount.value / packingList.value.length) * 100) : 0);
+
+                const togglePackingItem = (idx) => {
+                    packingList.value[idx].done = !packingList.value[idx].done;
+                    saveDataToCloudAndLocal();
+                };
+
+                const speakJapanese = (text) => {
+                    if ('speechSynthesis' in window) {
+                        window.speechSynthesis.cancel();
+                        const utterance = new SpeechSynthesisUtterance(text);
+                        utterance.lang = 'ja-JP';
+                        utterance.rate = 0.9;
+                        window.speechSynthesis.speak(utterance);
+                    }
+                };
+
                 const fetchWeatherForCity = async (cityName) => {
                     const coords = cityGeoMap[cityName];
                     if (!coords) return;
@@ -1035,14 +1265,17 @@
                     const points = [];
                     const locs = currentDay.value.items.filter(i => i.location);
 
-                    for (const item of locs) {
+                    locs.forEach((item, index) => {
                         let coords = locationGeoMap[item.location];
                         if (coords) {
                             points.push(coords);
-                            const marker = L.marker(coords).addTo(mapInstance).bindPopup(`<b>${item.activity}</b><br>${item.location}`);
+                            const iconHtml = `<div class="custom-map-pin w-7 h-7">${index + 1}</div>`;
+                            const customIcon = L.divIcon({ html: iconHtml, className: '', iconSize: [28, 28], iconAnchor: [14, 14] });
+                            
+                            const marker = L.marker(coords, { icon: customIcon }).addTo(mapInstance).bindPopup(`<b>${index + 1}. ${item.activity}</b><br>${item.location}`);
                             mapMarkers.push(marker);
                         }
-                    }
+                    });
 
                     if (points.length > 0) {
                         mapPolyline = L.polyline(points, { color: '#4338CA', weight: 4, dashArray: '6, 8' }).addTo(mapInstance);
@@ -1184,14 +1417,15 @@
                     totalExpenses, perPersonExpense, settlements, expenses, members,
                     currentDayWeather, filteredExpenses, getExpenseOriginalIndex,
                     exchangeRate, calcJpyInput, calcTwdResult, totalExpensesTwd, perPersonExpenseTwd,
-                    setExchangeRate,
+                    setExchangeRate, packingList, checkedPackingCount, packingProgressPercent, togglePackingItem,
+                    japanesePhrases, speakJapanese, copyLineItineraryText, exportBackupJson, importBackupJson,
                     getCategoryIcon, getCategoryName, getCategoryBgColor, getCategoryBadgeClass,
-                    getGoogleNavLink, getExpenseCategoryIcon,
+                    getGoogleNavLink, getExpenseCategoryIcon, moveItineraryItem,
                     switchToMapTab, renderMapForCurrentDay,
                     showItineraryModal, editingItineraryIdx, itineraryForm, openItineraryModal, saveItineraryItem, deleteItineraryItem, editDayHotel,
                     showExpenseModal, editingExpenseIdx, expenseForm, openExpenseModal, toggleExpenseMember, saveExpense, deleteExpense,
                     showMemberModal, newMemberName, editingMemberIndex, editMemberNameInput, openMemberModal, startEditMember, saveEditMember, addMember, removeMember,
-                    saveDataToCloudAndLocal, showShareModal, isCloudConnected, currentTripId, tripInputCode, copyNotice, switchTripId, copyShareLink
+                    saveDataToCloudAndLocal, showShareModal, currentTripId, tripInputCode, copyNotice, switchTripId, copyShareLink
                 };
             }
         }).mount('#app')
