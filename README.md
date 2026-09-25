@@ -1,2 +1,1102 @@
 # kyushu-trip
 九州秋季之旅 Web App
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <!-- 修正手機版視口與縮放，確保強制滿版與防畫面抖動 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>九州秋季之旅</title>
+    
+    <!-- PWA & 全螢幕 APP 設定 -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="九州秋季之旅">
+    <meta name="theme-color" content="#0f172a">
+    
+    <!-- 熊本熊 APP 圖示 Icon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='20' cy='20' r='15' fill='%231a1a1a'/><circle cx='80' cy='20' r='15' fill='%231a1a1a'/><ellipse cx='50' cy='54' rx='44' ry='40' fill='%231a1a1a'/><ellipse cx='50' cy='64' rx='21' ry='16' fill='%23ffffff'/><ellipse cx='50' cy='55' rx='8' ry='6' fill='%231a1a1a'/><circle cx='18' cy='60' r='10' fill='%23dc2626'/><circle cx='82' cy='60' r='10' fill='%23dc2626'/></svg>">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%230f172a'/><circle cx='30' cy='30' r='12' fill='%23ffffff'/><circle cx='70' cy='30' r='12' fill='%23ffffff'/><circle cx='30' cy='30' r='6' fill='%231a1a1a'/><circle cx='70' cy='30' r='6' fill='%231a1a1a'/><ellipse cx='50' cy='58' rx='38' ry='32' fill='%231a1a1a'/><ellipse cx='50' cy='66' rx='18' ry='13' fill='%23ffffff'/><ellipse cx='50' cy='58' rx='7' ry='5' fill='%231a1a1a'/><circle cx='22' cy='64' r='8' fill='%23dc2626'/><circle cx='78' cy='64' r='8' fill='%23dc2626'/></svg>">
+
+    <!-- Vue 3 Global Build -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts (繁體中文 Noto Sans TC) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <!-- Leaflet CSS & JS (地圖功能) -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+
+    <style>
+        :root {
+            --app-bg: #F8FAF8;
+            --text-primary: #0F172A;
+            --text-secondary: #475569;
+            --brand-primary: #4338CA;
+            --brand-accent: #D97706;
+        }
+        
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #0f172a;
+            font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+            color: var(--text-primary);
+            -webkit-tap-highlight-color: transparent;
+            font-size: 16px; 
+            user-select: none;
+        }
+        
+        .hide-scroll::-webkit-scrollbar { display: none; }
+        .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
+
+        .btn-bounce { transition: transform 0.1s ease, opacity 0.15s ease; }
+        .btn-bounce:active { transform: scale(0.95); opacity: 0.9; }
+
+        .fade-enter-active, .fade-leave-active { transition: opacity 0.2s ease; }
+        .fade-enter-from, .fade-leave-to { opacity: 0; }
+
+        #map { height: 100%; width: 100%; min-height: 380px; z-index: 1; }
+    </style>
+</head>
+<body class="flex flex-col items-center justify-center p-0 m-0 overflow-hidden">
+
+    <div id="app" class="w-full h-full bg-slate-50 flex flex-col overflow-hidden relative border-0 md:max-w-md md:h-[95vh] md:rounded-3xl md:shadow-2xl md:border md:border-slate-800">
+
+        <!-- 頂部導覽列 -->
+        <header class="bg-slate-900 text-white shrink-0 z-20 px-3.5 py-3 shadow-md border-b border-slate-800 pt-safe">
+            <div class="flex items-center justify-between gap-2">
+                <div class="flex items-center gap-2 min-w-0">
+                    <div class="w-9 h-9 bg-slate-800 rounded-xl flex items-center justify-center shrink-0 shadow-inner border border-slate-700 p-0.5">
+                        <svg viewBox="0 0 100 100" class="w-full h-full">
+                            <circle cx="20" cy="20" r="15" fill="#1a1a1a" />
+                            <circle cx="80" cy="20" r="15" fill="#1a1a1a" />
+                            <circle cx="20" cy="20" r="7" fill="#ffffff" />
+                            <circle cx="80" cy="20" r="7" fill="#ffffff" />
+                            <ellipse cx="50" cy="54" rx="44" ry="40" fill="#1a1a1a" />
+                            <ellipse cx="50" cy="64" rx="21" ry="16" fill="#ffffff" />
+                            <ellipse cx="50" cy="55" rx="8" ry="6" fill="#1a1a1a" />
+                            <path d="M42 66 Q50 74 58 66" fill="none" stroke="#1a1a1a" stroke-width="3.5" stroke-linecap="round" />
+                            <circle cx="32" cy="44" r="7.5" fill="#ffffff" />
+                            <circle cx="32" cy="44" r="3.5" fill="#1a1a1a" />
+                            <circle cx="68" cy="44" r="7.5" fill="#ffffff" />
+                            <circle cx="68" cy="44" r="3.5" fill="#1a1a1a" />
+                            <circle cx="18" cy="60" r="10" fill="#dc2626" />
+                            <circle cx="82" cy="60" r="10" fill="#dc2626" />
+                        </svg>
+                    </div>
+                    <div class="min-w-0">
+                        <div class="flex items-center gap-1.5">
+                            <h1 class="text-base font-black tracking-wider leading-tight text-white truncate">九州秋季之旅</h1>
+                        </div>
+                        <p class="text-[10px] text-slate-400 font-medium flex items-center gap-1">
+                            <span>10/10 - 10/18</span>
+                            <span v-if="isCloudConnected" class="inline-block w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" title="已開啟雲端同步"></span>
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="flex items-center gap-1 shrink-0">
+                    <button @click="showShareModal = true" title="多人共用設定" class="bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold px-2.5 py-1.5 rounded-full text-xs flex items-center gap-1 btn-bounce border border-indigo-400/40 shadow-xs">
+                        <i class="ph-bold ph-users-three text-xs"></i>
+                        <span>共用</span>
+                    </button>
+
+                    <a href="https://translate.google.com/?sl=ja&tl=zh-TW" target="_blank" title="Google 翻譯" class="bg-slate-800 hover:bg-slate-700 text-white font-extrabold px-2 py-1.5 rounded-full text-xs flex items-center gap-1 btn-bounce border border-slate-700">
+                        <i class="ph-bold ph-translate text-xs"></i>
+                    </a>
+                    <a href="https://lens.google.com/" target="_blank" title="Google Lens" class="bg-slate-800 hover:bg-slate-700 text-white font-extrabold px-2 py-1.5 rounded-full text-xs flex items-center gap-1 btn-bounce border border-slate-700">
+                        <i class="ph-bold ph-camera text-xs"></i>
+                    </a>
+                    <button v-if="currentTab === 'plan'" @click="openItineraryModal()" class="bg-white/10 hover:bg-white/20 text-white font-black px-2 py-1.5 rounded-full text-xs flex items-center gap-1 btn-bounce border border-white/15">
+                        <i class="ph-bold ph-plus text-xs"></i>
+                    </button>
+                    <button v-if="currentTab === 'expense'" @click="openExpenseModal()" class="bg-amber-500 hover:bg-amber-600 text-white font-black px-2 py-1.5 rounded-full text-xs flex items-center gap-1 btn-bounce">
+                        <i class="ph-bold ph-plus text-xs"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div @click="showShareModal = true" class="mt-2 bg-slate-800/90 hover:bg-slate-800 cursor-pointer rounded-xl px-2.5 py-1 flex items-center justify-between text-[11px] border border-slate-700/80 transition-colors">
+                <div class="flex items-center gap-1.5 truncate text-slate-300">
+                    <i class="ph-bold text-xs" :class="isCloudConnected ? 'ph-cloud-check text-emerald-400' : 'ph-cloud-slash text-amber-400'"></i>
+                    <span class="truncate">
+                        {{ isCloudConnected ? `共用中代碼：${currentTripId}` : '離線模式 (點此開啟多人共用)' }}
+                    </span>
+                </div>
+                <span class="text-[10px] font-bold text-indigo-300 shrink-0 flex items-center gap-0.5">
+                    設定代碼 <i class="ph-bold ph-caret-right"></i>
+                </span>
+            </div>
+        </header>
+
+        <!-- 日期分頁 -->
+        <div v-if="currentTab === 'plan' || currentTab === 'map'" class="bg-white px-2.5 py-2 border-b border-slate-200 flex items-center gap-1.5 shrink-0 z-10 overflow-x-auto hide-scroll">
+            <button v-for="(day, idx) in days" 
+                    :key="idx" 
+                    @click="currentDayIdx = idx"
+                    :class="currentDayIdx === idx ? 'bg-slate-900 text-white shadow-xs border-slate-900 font-black' : 'bg-slate-100 text-slate-700 hover:bg-slate-200 border-slate-200 font-bold'"
+                    class="flex flex-col items-center justify-center min-w-[62px] px-2 py-1 rounded-xl border transition-all shrink-0 btn-bounce">
+                <span class="text-[10px] leading-tight" :class="currentDayIdx === idx ? 'text-amber-300' : 'text-slate-500'">Day {{ idx + 1 }}</span>
+                <span class="text-xs leading-tight mt-0.5">{{ day.shortDate }}</span>
+                <span class="text-[9px] leading-tight mt-0.5" :class="currentDayIdx === idx ? 'text-slate-300' : 'text-slate-400'">{{ day.city }}</span>
+            </button>
+        </div>
+
+        <main class="flex-1 overflow-y-auto relative hide-scroll px-4 pt-3.5 pb-20 bg-slate-100">
+            
+            <!-- 1️⃣ 行程表視圖 -->
+            <transition name="fade" mode="out-in">
+                <div v-if="currentTab === 'plan'" :key="currentDayIdx" class="space-y-3.5 relative min-h-full">
+                    <div class="grid grid-cols-2 gap-2.5 relative z-10">
+                        <div class="bg-white p-3 rounded-2xl border border-slate-200/90 shadow-2xs flex flex-col justify-between">
+                            <div>
+                                <div class="flex justify-between items-center mb-1">
+                                    <span class="text-[11px] font-black text-indigo-700">Day {{ currentDayIdx + 1 }} 住宿</span>
+                                    <button @click="editDayHotel()" class="text-[10px] bg-slate-100 text-slate-800 font-black px-1.5 py-0.5 rounded-md border border-slate-200 btn-bounce">
+                                        修改
+                                    </button>
+                                </div>
+                                <div class="text-xs sm:text-sm font-black text-slate-900 leading-tight flex items-center gap-1.5 mt-0.5">
+                                    <i class="ph-fill ph-bed text-indigo-600 text-base shrink-0"></i>
+                                    <span class="truncate">{{ currentDay.hotel || '未設定住宿' }}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white p-3 rounded-2xl border border-slate-200/90 shadow-2xs flex flex-col justify-between">
+                            <div>
+                                <div class="text-[11px] font-black text-sky-800 flex items-center gap-1 mb-0.5">
+                                    <i class="ph-fill ph-map-pin text-sky-600 text-xs"></i> {{ currentDay.city }} 天氣
+                                </div>
+                                <div v-if="currentDayWeather" class="flex items-center justify-between mt-0.5">
+                                    <div class="flex items-baseline gap-1">
+                                        <span class="text-2xl font-black text-slate-900">{{ currentDayWeather.temp }}°</span>
+                                        <span class="text-xs font-black text-slate-700">{{ currentDayWeather.desc }}</span>
+                                    </div>
+                                    <i :class="currentDayWeather.icon" class="text-2xl text-sky-600 shrink-0"></i>
+                                </div>
+                                <div v-else class="text-xs font-bold text-slate-500 mt-1">載入中...</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="relative pl-3 space-y-3.5 my-2 before:absolute before:left-[17px] before:top-4 before:bottom-4 before:w-1 before:bg-indigo-200/70 before:rounded-full">
+                        <div v-for="(item, idx) in currentDay.items" :key="item.id || idx" class="relative group">
+                            <div class="bg-white p-4 rounded-2xl shadow-2xs border border-slate-200/90 relative z-10">
+                                <div class="flex items-start gap-3">
+                                    <div class="flex flex-col items-center justify-center bg-slate-50 border border-slate-200 rounded-xl p-2 min-w-[72px] text-center shrink-0">
+                                        <div class="w-8 h-8 rounded-xl flex items-center justify-center mb-1 shadow-2xs" :class="getCategoryBgColor(item.type)">
+                                            <i :class="getCategoryIcon(item.type)" class="text-lg"></i>
+                                        </div>
+                                        <span class="text-[10px] font-black px-1.5 py-0.5 rounded border" :class="getCategoryBadgeClass(item.type)">
+                                            {{ getCategoryName(item.type) }}
+                                        </span>
+                                        <span class="text-xs font-black text-slate-800 mt-1">{{ item.time || '--:--' }}</span>
+                                    </div>
+                                    
+                                    <div class="flex-1 min-w-0 pt-0.5">
+                                        <div class="text-base font-black text-slate-900 leading-snug break-words">
+                                            {{ item.activity }}
+                                        </div>
+
+                                        <div v-if="item.location" class="flex items-center gap-1 text-xs font-bold text-slate-700 mt-1.5 bg-slate-100 px-2.5 py-1 rounded-xl w-max max-w-full truncate border border-slate-200">
+                                            <i class="ph-fill ph-map-pin text-indigo-600 text-sm shrink-0"></i>
+                                            <span class="truncate">{{ item.location }}</span>
+                                        </div>
+
+                                        <div v-if="item.itemNote" class="mt-2 text-xs font-bold text-amber-900 bg-amber-50 border border-amber-200/80 px-2.5 py-1.5 rounded-xl flex items-start gap-1.5">
+                                            <i class="ph-fill ph-notebook text-amber-700 text-sm shrink-0 mt-0.5"></i>
+                                            <span class="break-words">{{ item.itemNote }}</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="flex flex-col gap-1.5 shrink-0">
+                                        <a v-if="item.location" :href="getGoogleNavLink(item.location)" target="_blank" title="Google 導航" class="w-7 h-7 flex items-center justify-center bg-sky-50 text-sky-700 hover:bg-sky-100 rounded-lg btn-bounce border border-sky-200">
+                                            <i class="ph-bold ph-navigation-arrow text-sm"></i>
+                                        </a>
+                                        <button @click="openItineraryModal(item, idx)" title="編輯" class="w-7 h-7 flex items-center justify-center bg-slate-100 text-slate-700 hover:bg-slate-200 rounded-lg btn-bounce border border-slate-200">
+                                            <i class="ph-bold ph-pencil text-xs"></i>
+                                        </button>
+                                        <button @click="deleteItineraryItem(idx)" title="刪除" class="w-7 h-7 flex items-center justify-center bg-slate-100 text-slate-500 hover:text-red-600 rounded-lg btn-bounce border border-slate-200">
+                                            <i class="ph-bold ph-trash text-xs"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div v-if="!currentDay.items || currentDay.items.length === 0" class="bg-white/90 border-2 border-dashed border-slate-300 rounded-2xl p-6 text-center text-slate-600">
+                            <i class="ph-duotone ph-calendar-plus text-4xl mb-2 text-indigo-400"></i>
+                            <p class="text-sm font-black text-slate-800">今天還沒有安排行程喔！</p>
+                            <button @click="openItineraryModal()" class="mt-3 bg-indigo-600 text-white font-black text-xs px-4 py-2 rounded-xl btn-bounce shadow-xs">
+                                + 立即新增第一個行程
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="bg-amber-50 rounded-2xl border border-amber-200/90 shadow-2xs mt-3 overflow-hidden">
+                        <button @click="isNoteOpen = !isNoteOpen" class="w-full px-3.5 py-2.5 flex justify-between items-center text-left hover:bg-amber-100/50 btn-bounce">
+                            <div class="flex items-center gap-2">
+                                <i class="ph-fill ph-note-pencil text-amber-700 text-base"></i>
+                                <span class="text-xs font-black text-amber-950">Day {{ currentDayIdx + 1 }} 當日備註</span>
+                                <span v-if="currentDay.note" class="text-[10px] bg-amber-200 text-amber-900 font-black px-2 py-0.5 rounded-full border border-amber-300">
+                                    有內容
+                                </span>
+                            </div>
+                            <i :class="isNoteOpen ? 'ph-bold ph-caret-up' : 'ph-bold ph-caret-down'" class="text-xs text-amber-800"></i>
+                        </button>
+
+                        <div v-show="isNoteOpen" class="p-3 pt-0 border-t border-amber-200/60">
+                            <textarea v-model="currentDay.note" 
+                                      @change="saveDataToCloudAndLocal" 
+                                      rows="3" 
+                                      placeholder="點擊輸入此日備註事項..." 
+                                      class="w-full mt-2 px-3 py-2 bg-white border border-amber-200 rounded-xl text-xs font-bold text-slate-900 focus:outline-none focus:border-indigo-500 resize-none shadow-2xs leading-relaxed"></textarea>
+                        </div>
+                    </div>
+
+                </div>
+            </transition>
+
+            <!-- 2️⃣ 地圖視圖 -->
+            <transition name="fade" mode="out-in">
+                <div v-show="currentTab === 'map'" class="h-full w-full rounded-2xl overflow-hidden shadow-xs border border-slate-200 relative min-h-[400px]">
+                    <div id="map"></div>
+                </div>
+            </transition>
+
+            <!-- 3️⃣ 分帳記帳視圖 -->
+            <transition name="fade" mode="out-in">
+                <div v-if="currentTab === 'expense'" class="space-y-4 relative min-h-full">
+                    <div class="bg-gradient-to-br from-slate-900 via-slate-800 to-zinc-900 text-white rounded-2xl p-4 shadow-md border border-slate-700 space-y-3">
+                        <div class="flex justify-between items-start gap-2">
+                            <div>
+                                <div class="text-xs text-amber-300 font-bold flex items-center gap-1">
+                                    <i class="ph-fill ph-coins text-amber-400"></i> 旅遊總支出
+                                </div>
+                                <div class="text-2xl font-black mt-1 text-amber-50 flex items-baseline gap-2">
+                                    <span>¥ {{ totalExpenses.toLocaleString() }}</span>
+                                    <span class="text-xs font-bold text-amber-200/90 bg-amber-500/20 px-2 py-0.5 rounded-md border border-amber-400/30">
+                                        NT$ {{ totalExpensesTwd.toLocaleString() }}
+                                    </span>
+                                </div>
+                            </div>
+                            <button @click="openMemberModal()" class="bg-white/10 hover:bg-white/20 text-white font-black px-2.5 py-1.5 rounded-xl text-xs flex items-center gap-1 border border-white/20 btn-bounce">
+                                <i class="ph-bold ph-users text-xs"></i> 成員 ({{ members.length }})
+                            </button>
+                        </div>
+
+                        <div class="bg-white/10 backdrop-blur-md rounded-xl p-2.5 border border-white/15 flex flex-wrap items-center justify-between gap-2 text-xs">
+                            <div class="flex items-center gap-1.5 font-black text-amber-200">
+                                <i class="ph-bold ph-currency-jpy text-sm"></i>
+                                <span>換算匯率:</span>
+                                <span class="text-[11px] text-slate-300 font-normal">1 日圓 =</span>
+                                <input v-model.number="exchangeRate" @change="saveDataToCloudAndLocal" type="number" step="0.001" min="0.001" class="w-16 px-1.5 py-0.5 bg-slate-800 text-amber-300 font-black rounded border border-amber-400/50 text-center focus:outline-none focus:border-amber-400">
+                                <span class="text-[11px] text-slate-300 font-normal">台幣</span>
+                            </div>
+                            <div class="flex gap-1">
+                                <button @click="setExchangeRate(0.21)" class="px-2 py-0.5 rounded text-[10px] font-bold border btn-bounce" :class="exchangeRate === 0.21 ? 'bg-amber-500 text-slate-900 border-amber-400 font-black' : 'bg-white/10 text-slate-300 border-white/20'">0.21</button>
+                                <button @click="setExchangeRate(0.215)" class="px-2 py-0.5 rounded text-[10px] font-bold border btn-bounce" :class="exchangeRate === 0.215 ? 'bg-amber-500 text-slate-900 border-amber-400 font-black' : 'bg-white/10 text-slate-300 border-white/20'">0.215</button>
+                                <button @click="setExchangeRate(0.22)" class="px-2 py-0.5 rounded text-[10px] font-bold border btn-bounce" :class="exchangeRate === 0.22 ? 'bg-amber-500 text-slate-900 border-amber-400 font-black' : 'bg-white/10 text-slate-300 border-white/20'">0.22</button>
+                            </div>
+                        </div>
+
+                        <div class="pt-2 border-t border-white/15 flex justify-between items-center text-xs">
+                            <span class="text-slate-300 font-bold">每人預計平攤</span>
+                            <span class="font-black text-xs bg-white/10 px-2.5 py-1 rounded-lg border border-white/10 text-amber-200">
+                                ¥ {{ perPersonExpense.toLocaleString() }}
+                                <span class="text-[11px] text-slate-300 font-normal"> (約 NT$ {{ perPersonExpenseTwd.toLocaleString() }}) / 人</span>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="bg-indigo-900/90 text-white p-3 rounded-2xl shadow-2xs border border-indigo-700/80 flex items-center justify-between gap-2">
+                        <div class="flex items-center gap-1.5 text-xs font-black text-indigo-200 shrink-0">
+                            <i class="ph-bold ph-calculator text-indigo-300 text-base"></i>
+                            <span>快捷換算</span>
+                        </div>
+                        <div class="flex items-center gap-1.5 flex-1 max-w-[210px] justify-end">
+                            <div class="relative w-24">
+                                <input v-model.number="calcJpyInput" type="number" placeholder="日圓" class="w-full pl-5 pr-1.5 py-1 bg-indigo-950/90 border border-indigo-500/50 rounded-lg text-xs font-black text-white focus:outline-none focus:border-amber-400 text-right">
+                                <span class="absolute left-1.5 top-1 text-xs text-indigo-400 font-black">¥</span>
+                            </div>
+                            <span class="text-xs font-black text-amber-300 shrink-0">≈</span>
+                            <div class="text-xs font-black text-amber-300 bg-indigo-950/90 px-2 py-1 rounded-lg border border-indigo-500/50 shrink-0 min-w-[70px] text-right">
+                                NT$ {{ calcTwdResult.toLocaleString() }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-3.5 rounded-2xl shadow-2xs border border-slate-200 space-y-2">
+                        <div class="flex items-center gap-1.5 pb-2 border-b border-slate-100">
+                            <i class="ph-fill ph-arrows-left-right text-amber-600 text-sm"></i>
+                            <h3 class="text-xs font-black text-slate-900">平攤結算建議</h3>
+                        </div>
+                        <div v-if="settlements.length > 0" class="space-y-1.5">
+                            <div v-for="(s, idx) in settlements" :key="idx" class="flex items-center justify-between bg-amber-50/70 p-2.5 rounded-xl border border-amber-200/60 text-xs font-black text-slate-800">
+                                <div class="flex items-center gap-1.5">
+                                    <span class="bg-amber-100 text-amber-900 px-2 py-0.5 rounded">{{ s.from }}</span>
+                                    <span class="text-amber-600 font-bold">給</span>
+                                    <span class="bg-amber-100 text-amber-900 px-2 py-0.5 rounded">{{ s.to }}</span>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-xs font-black text-amber-800">¥ {{ s.amount.toLocaleString() }}</div>
+                                    <div class="text-[10px] text-slate-500 font-medium">(約 NT$ {{ Math.round(s.amount * exchangeRate).toLocaleString() }})</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div v-else class="text-center py-2 text-xs text-slate-500 font-bold">
+                            🎉 目前帳目已完全平衡！
+                        </div>
+                    </div>
+
+                    <div class="space-y-2">
+                        <div class="flex justify-between items-center px-1">
+                            <h3 class="text-xs font-black text-slate-700 flex items-center gap-1">
+                                <i class="ph-fill ph-receipt text-indigo-600 text-sm"></i> 
+                                消費明細 ({{ filteredExpenses.length }})
+                            </h3>
+                            <button @click="openExpenseModal()" class="text-xs font-black text-amber-700 bg-amber-100 px-2.5 py-1 rounded-lg border border-amber-200 btn-bounce">
+                                + 記一筆
+                            </button>
+                        </div>
+
+                        <div v-for="(exp, idx) in filteredExpenses" :key="exp.id || idx" class="bg-white p-3 rounded-2xl shadow-2xs border border-slate-200 flex items-center justify-between gap-2">
+                            <div class="flex items-center gap-2.5 min-w-0">
+                                <div class="w-9 h-9 rounded-xl bg-slate-100 text-slate-800 border border-slate-200 flex items-center justify-center shrink-0">
+                                    <i :class="getExpenseCategoryIcon(exp.category)" class="text-lg"></i>
+                                </div>
+                                <div class="min-w-0">
+                                    <div class="text-xs font-black text-slate-900 truncate">{{ exp.title }}</div>
+                                    <div class="flex items-center gap-1.5 text-[10px] font-bold text-slate-500 mt-0.5">
+                                        <span class="bg-indigo-50 text-indigo-800 px-1 py-0.5 rounded border border-indigo-200 font-black">Day {{ (exp.dayIdx !== undefined ? exp.dayIdx : 0) + 1 }}</span>
+                                        <span>由 {{ exp.paidBy }} 付款</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-1.5 shrink-0">
+                                <div class="text-right">
+                                    <div class="text-xs font-black text-slate-900">¥ {{ Number(exp.amount).toLocaleString() }}</div>
+                                    <div class="text-[10px] font-medium text-slate-500">NT$ {{ Math.round(Number(exp.amount) * exchangeRate).toLocaleString() }}</div>
+                                </div>
+                                <button @click="openExpenseModal(exp, getExpenseOriginalIndex(exp))" class="w-6 h-6 flex items-center justify-center bg-slate-100 text-slate-700 rounded btn-bounce">
+                                    <i class="ph-bold ph-pencil text-xs"></i>
+                                </button>
+                                <button @click="deleteExpense(getExpenseOriginalIndex(exp))" class="w-6 h-6 flex items-center justify-center bg-slate-100 text-slate-500 hover:text-red-600 rounded btn-bounce">
+                                    <i class="ph-bold ph-trash text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div v-if="filteredExpenses.length === 0" class="bg-white/90 border-2 border-dashed border-slate-300 rounded-2xl p-5 text-center text-slate-500 text-xs font-bold">
+                            尚無消費紀錄，點擊「記一筆」新增！
+                        </div>
+                    </div>
+
+                </div>
+            </transition>
+
+        </main>
+
+        <!-- 底部導覽 -->
+        <nav class="absolute bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-200 px-4 py-2 flex justify-around items-center z-30 pb-safe">
+            <button @click="currentTab = 'plan'" :class="currentTab === 'plan' ? 'text-indigo-600 scale-105' : 'text-slate-400'" class="flex flex-col items-center gap-0.5 btn-bounce">
+                <i :class="currentTab === 'plan' ? 'ph-fill ph-calendar-check' : 'ph-bold ph-calendar'" class="text-xl"></i>
+                <span class="text-[11px] font-black flex items-center gap-1">
+                    <span class="text-xs">🎌</span> 行程表
+                </span>
+            </button>
+
+            <button @click="switchToMapTab()" :class="currentTab === 'map' ? 'text-indigo-600 scale-105' : 'text-slate-400'" class="flex flex-col items-center gap-0.5 btn-bounce">
+                <i :class="currentTab === 'map' ? 'ph-fill ph-map-trifold' : 'ph-bold ph-map-trifold'" class="text-xl"></i>
+                <span class="text-[11px] font-black flex items-center gap-1">
+                    <span class="text-xs">🗾</span> 地圖導航
+                </span>
+            </button>
+
+            <button @click="currentTab = 'expense'" :class="currentTab === 'expense' ? 'text-amber-600 scale-105' : 'text-slate-400'" class="flex flex-col items-center gap-0.5 btn-bounce">
+                <i :class="currentTab === 'expense' ? 'ph-fill ph-wallet' : 'ph-bold ph-wallet'" class="text-xl"></i>
+                <span class="text-[11px] font-black flex items-center gap-1">
+                    <span class="text-xs">💴</span> 分帳記帳
+                </span>
+            </button>
+
+            <div class="hidden sm:flex items-center gap-1 bg-rose-50 border border-rose-200 px-2 py-1 rounded-full shrink-0">
+                <div class="w-4 h-4 rounded-full overflow-hidden shrink-0">
+                    <svg viewBox="0 0 100 100" class="w-full h-full">
+                        <circle cx="20" cy="20" r="15" fill="#1a1a1a" />
+                        <circle cx="80" cy="20" r="15" fill="#1a1a1a" />
+                        <ellipse cx="50" cy="54" rx="44" ry="40" fill="#1a1a1a" />
+                        <ellipse cx="50" cy="64" rx="21" ry="16" fill="#ffffff" />
+                        <ellipse cx="50" cy="55" rx="8" ry="6" fill="#1a1a1a" />
+                        <circle cx="18" cy="60" r="10" fill="#dc2626" />
+                        <circle cx="82" cy="60" r="10" fill="#dc2626" />
+                    </svg>
+                </div>
+                <span class="text-[10px] font-black text-rose-800">九州秋旅</span>
+            </div>
+        </nav>
+
+        <!-- 🌐 雲端共用 Modal -->
+        <transition name="fade">
+            <div v-if="showShareModal" class="absolute inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+                <div class="bg-white w-full max-w-sm rounded-3xl p-5 space-y-4 shadow-2xl border border-slate-200">
+                    <div class="flex justify-between items-center pb-2 border-b border-slate-200">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-xl bg-indigo-100 text-indigo-700 flex items-center justify-center">
+                                <i class="ph-bold ph-users-three text-lg"></i>
+                            </div>
+                            <h3 class="text-base font-black text-slate-900">多人即時共用行程</h3>
+                        </div>
+                        <button @click="showShareModal = false" class="w-7 h-7 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center font-black">✕</button>
+                    </div>
+
+                    <div class="space-y-3 text-xs">
+                        <div class="bg-indigo-50 border border-indigo-200/80 p-3 rounded-2xl text-indigo-900 leading-relaxed font-bold">
+                            💡 <b>如何與旅伴共用？</b><br>
+                            只要將「<b>共用代碼</b>」給旅伴輸入，或分享「<b>邀請連結</b>」，所有人就能同步查看行程與消費！
+                        </div>
+
+                        <div>
+                            <label class="font-black text-slate-800 block mb-1">您的當前共用代碼 (Trip ID)</label>
+                            <div class="flex gap-2">
+                                <input v-model="tripInputCode" type="text" placeholder="例如：kyushu-2026" class="flex-1 px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl font-black text-slate-800 focus:outline-none focus:border-indigo-600">
+                                <button @click="switchTripId(tripInputCode)" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3.5 py-2 rounded-xl font-black btn-bounce shrink-0">
+                                    切換代碼
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="pt-2 border-t border-slate-100 space-y-2">
+                            <button @click="copyShareLink" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-black rounded-xl shadow-xs flex items-center justify-center gap-2 btn-bounce">
+                                <i class="ph-bold ph-link text-base"></i>
+                                <span>複製專屬共用連結</span>
+                            </button>
+                        </div>
+
+                        <div v-if="copyNotice" class="text-center font-black text-xs text-emerald-600 bg-emerald-50 py-1.5 rounded-lg border border-emerald-200">
+                            {{ copyNotice }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </transition>
+
+        <!-- 📝 行程 Modal -->
+        <transition name="fade">
+            <div v-if="showItineraryModal" class="absolute inset-0 bg-slate-900/50 backdrop-blur-xs z-50 flex items-end justify-center">
+                <div class="bg-white w-full rounded-t-3xl p-5 space-y-3 max-h-[85vh] overflow-y-auto hide-scroll shadow-2xl border-t border-slate-200">
+                    <div class="flex justify-between items-center pb-2 border-b border-slate-200">
+                        <h3 class="text-base font-black text-slate-900">
+                            {{ editingItineraryIdx !== null ? '編輯行程項目' : '新增行程項目' }}
+                        </h3>
+                        <button @click="showItineraryModal = false" class="w-7 h-7 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center font-black">✕</button>
+                    </div>
+
+                    <div class="space-y-3 text-xs font-black">
+                        <div>
+                            <label class="text-slate-700">時間</label>
+                            <input v-model="itineraryForm.time" type="text" placeholder="例如：09:30" class="w-full mt-1 p-2.5 bg-slate-50 border border-slate-300 rounded-xl">
+                        </div>
+
+                        <div>
+                            <label class="text-slate-700">類型</label>
+                            <select v-model="itineraryForm.type" class="w-full mt-1 p-2.5 bg-slate-50 border border-slate-300 rounded-xl">
+                                <option value="spot">景點 📸</option>
+                                <option value="food">美食 🍱</option>
+                                <option value="transport">交通 🚆</option>
+                                <option value="flight">航班 ✈️</option>
+                                <option value="shop">購物 🛍️</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="text-slate-700">活動描述</label>
+                            <input v-model="itineraryForm.activity" type="text" placeholder="例如：參觀熊本城" class="w-full mt-1 p-2.5 bg-slate-50 border border-slate-300 rounded-xl">
+                        </div>
+
+                        <div>
+                            <label class="text-slate-700">地點名稱 (導航用)</label>
+                            <input v-model="itineraryForm.location" type="text" placeholder="例如：熊本城" class="w-full mt-1 p-2.5 bg-slate-50 border border-slate-300 rounded-xl">
+                        </div>
+
+                        <div>
+                            <label class="text-slate-700">專屬備註</label>
+                            <textarea v-model="itineraryForm.itemNote" rows="2" placeholder="例如：預約編號 #12345..." class="w-full mt-1 p-2.5 bg-slate-50 border border-slate-300 rounded-xl resize-none"></textarea>
+                        </div>
+                    </div>
+
+                    <button @click="saveItineraryItem()" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-black text-sm rounded-xl shadow-xs btn-bounce">
+                        儲存行程
+                    </button>
+                </div>
+            </div>
+        </transition>
+
+        <!-- 💸 記帳 Modal -->
+        <transition name="fade">
+            <div v-if="showExpenseModal" class="absolute inset-0 bg-slate-900/50 backdrop-blur-xs z-50 flex items-end justify-center">
+                <div class="bg-white w-full rounded-t-3xl p-5 space-y-3 max-h-[85vh] overflow-y-auto hide-scroll shadow-2xl border-t border-slate-200">
+                    <div class="flex justify-between items-center pb-2 border-b border-slate-200">
+                        <h3 class="text-base font-black text-slate-900">
+                            {{ editingExpenseIdx !== null ? '編輯消費帳目' : '新增消費帳目' }}
+                        </h3>
+                        <button @click="showExpenseModal = false" class="w-7 h-7 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center font-black">✕</button>
+                    </div>
+
+                    <div class="space-y-3 text-xs font-black">
+                        <div>
+                            <label class="text-slate-700">對應行程天數</label>
+                            <select v-model="expenseForm.dayIdx" class="w-full mt-1 p-2.5 bg-slate-50 border border-slate-300 rounded-xl">
+                                <option v-for="(d, idx) in days" :key="idx" :value="idx">Day {{ idx + 1 }} - {{ d.shortDate }} ({{ d.city }})</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="text-slate-700">消費項目</label>
+                            <input v-model="expenseForm.title" type="text" placeholder="例如：黑川溫泉午餐" class="w-full mt-1 p-2.5 bg-slate-50 border border-slate-300 rounded-xl">
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between items-center">
+                                <label class="text-slate-700">金額 (日圓 ¥)</label>
+                                <span v-if="expenseForm.amount" class="text-[11px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
+                                    約 NT$ {{ Math.round(expenseForm.amount * exchangeRate).toLocaleString() }}
+                                </span>
+                            </div>
+                            <input v-model.number="expenseForm.amount" type="number" placeholder="例如：4500" class="w-full mt-1 p-2.5 bg-slate-50 border border-slate-300 rounded-xl">
+                        </div>
+
+                        <div>
+                            <label class="text-slate-700">付款人</label>
+                            <select v-model="expenseForm.paidBy" class="w-full mt-1 p-2.5 bg-slate-50 border border-slate-300 rounded-xl">
+                                <option v-for="m in members" :key="m" :value="m">{{ m }}</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="text-slate-700 mb-1 block">平攤成員</label>
+                            <div class="flex flex-wrap gap-1.5">
+                                <button v-for="m in members" :key="m" 
+                                        @click="toggleExpenseMember(m)"
+                                        :class="expenseForm.splitAmong.includes(m) ? 'bg-amber-600 text-white border-amber-600' : 'bg-slate-100 text-slate-700 border-slate-300'"
+                                        class="px-3 py-1 rounded-xl text-xs font-black border btn-bounce">
+                                    {{ m }} {{ expenseForm.splitAmong.includes(m) ? '✓' : '' }}
+                                </button>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="text-slate-700">分類</label>
+                            <select v-model="expenseForm.category" class="w-full mt-1 p-2.5 bg-slate-50 border border-slate-300 rounded-xl">
+                                <option value="food">餐飲 🍽️</option>
+                                <option value="transport">交通 🚆</option>
+                                <option value="hotel">住宿 🏨</option>
+                                <option value="shop">購物 🛍️</option>
+                                <option value="ticket">門票/娛樂 🎟️</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <button @click="saveExpense()" class="w-full py-3 bg-amber-600 hover:bg-amber-700 text-white font-black text-sm rounded-xl shadow-xs btn-bounce mt-2">
+                        儲存帳目
+                    </button>
+                </div>
+            </div>
+        </transition>
+
+        <!-- 👥 成員 Modal -->
+        <transition name="fade">
+            <div v-if="showMemberModal" class="absolute inset-0 bg-slate-900/50 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+                <div class="bg-white w-full max-w-xs rounded-3xl p-5 space-y-3 shadow-2xl border border-slate-200">
+                    <div class="flex justify-between items-center pb-2 border-b border-slate-200">
+                        <h3 class="text-base font-black text-slate-900">旅伴成員設定</h3>
+                        <button @click="showMemberModal = false" class="text-slate-500 font-black">✕</button>
+                    </div>
+
+                    <div class="space-y-2 max-h-52 overflow-y-auto hide-scroll">
+                        <div v-for="(m, i) in members" :key="i" class="flex justify-between items-center bg-slate-50 p-2 rounded-xl text-xs font-black text-slate-800 border border-slate-200 gap-2">
+                            <template v-if="editingMemberIndex === i">
+                                <input v-model="editMemberNameInput" type="text" class="flex-1 p-1 bg-white border border-slate-300 rounded text-xs" @keyup.enter="saveEditMember(i)">
+                                <button @click="saveEditMember(i)" class="text-indigo-600 font-bold px-2 py-0.5 bg-indigo-50 rounded border border-indigo-200">儲存</button>
+                            </template>
+                            <template v-else>
+                                <span class="truncate">{{ m }}</span>
+                                <div class="flex items-center gap-1">
+                                    <button @click="startEditMember(i)" class="text-indigo-600 font-bold bg-indigo-50 px-2 py-0.5 rounded border border-indigo-100">編輯</button>
+                                    <button v-if="members.length > 1" @click="removeMember(i)" class="text-red-500 font-bold bg-red-50 px-2 py-0.5 rounded border border-red-100">刪除</button>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-2 pt-2 border-t border-slate-100">
+                        <input v-model="newMemberName" type="text" placeholder="輸入新成員姓名" class="flex-1 p-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-black" @keyup.enter="addMember()">
+                        <button @click="addMember()" class="bg-amber-600 hover:bg-amber-700 text-white px-3 py-2 rounded-xl text-xs font-black btn-bounce">新增</button>
+                    </div>
+                </div>
+            </div>
+        </transition>
+
+    </div>
+
+    <script>
+        // 安全 LocalStorage 讀取工具，防止資料毀損導致畫面空白
+        function safeParseJSON(key, fallback) {
+            try {
+                const item = localStorage.getItem(key);
+                return item ? JSON.parse(item) : fallback;
+            } catch (e) {
+                console.warn("Storage parse error, fallback used:", e);
+                return fallback;
+            }
+        }
+
+        const defaultKyushuData = [
+            {
+                date: '10/10 (六)', shortDate: '10/10', city: '大分', hotel: '大分JR九州Blossom飯店', note: '抵達機場後領取 JR Pass 實體票。',
+                items: [
+                    { id: '101', time: '12:00', type: 'flight', activity: '桃園 ➔ 大分 (15:00抵達)', location: '大分機場', itemNote: '提前 2 小時報到' },
+                    { id: '102', time: '16:00', type: 'transport', activity: '前往飯店 Check-in', location: '大分JR九州Blossom飯店', itemNote: '' }
+                ]
+            },
+            {
+                date: '10/11 (日)', shortDate: '10/11', city: '大分', hotel: '大分JR九州Blossom飯店', note: '昭和之町逛老街拍照。',
+                items: [
+                    { id: '201', time: '09:00', type: 'spot', activity: '大分出發 ➔ 豐後高田', location: '豐後高田 昭和之町', itemNote: '' },
+                    { id: '202', time: '13:30', type: 'spot', activity: '杵築城下町散策', location: '杵築城下町', itemNote: '' }
+                ]
+            },
+            {
+                date: '10/12 (一)', shortDate: '10/12', city: '別府', hotel: '大分JR九州Blossom飯店', note: '別府地獄組合券可在第一個地獄購買。',
+                items: [
+                    { id: '301', time: '09:00', type: 'spot', activity: '別府地獄巡禮', location: '海地獄', itemNote: '' },
+                    { id: '302', time: '14:00', type: 'spot', activity: '搭乘別府纜車', location: '別府高原駅', itemNote: '' }
+                ]
+            },
+            {
+                date: '10/13 (二)', shortDate: '10/13', city: '阿蘇', hotel: '阿蘇民宿', note: '草千里風大記得帶防風外套。',
+                items: [
+                    { id: '401', time: '08:03', type: 'transport', activity: '大分橫斷特急前往阿蘇', location: '阿蘇車站', itemNote: '' },
+                    { id: '402', time: '10:30', type: 'spot', activity: '草千里漫步', location: '草千里', itemNote: '' }
+                ]
+            },
+            {
+                date: '10/14 (三)', shortDate: '10/14', city: '熊本', hotel: '相鐵GRAND FRESA 熊本', note: '包車行程準時出發。',
+                items: [
+                    { id: '501', time: '08:30', type: 'transport', activity: '前往白川水源', location: '白川水源', itemNote: '' },
+                    { id: '502', time: '13:56', type: 'transport', activity: '搭乘阿蘇男孩號前往熊本', location: '熊本車站', itemNote: '' }
+                ]
+            },
+            {
+                date: '10/15 (四)', shortDate: '10/15', city: '久留米', hotel: '相鐵GRAND FRESA 熊本', note: '酒莊品酒。',
+                items: [
+                    { id: '601', time: '09:00', type: 'transport', activity: '前往久留米', location: '久留米車站', itemNote: '' }
+                ]
+            },
+            {
+                date: '10/16 (五)', shortDate: '10/16', city: '山鹿', hotel: '相鐵GRAND FRESA 熊本', note: '山鹿老街。',
+                items: [
+                    { id: '701', time: '09:30', type: 'spot', activity: '前往山鹿老街', location: '山鹿老街', itemNote: '' }
+                ]
+            },
+            {
+                date: '10/17 (六)', shortDate: '10/17', city: '熊本', hotel: '相鐵GRAND FRESA 熊本', note: '熊本城參觀。',
+                items: [
+                    { id: '801', time: '09:30', type: 'spot', activity: '參觀熊本城與城彩苑', location: '熊本城', itemNote: '' },
+                    { id: '802', time: '16:30', type: 'spot', activity: '尋找熊本熊部長', location: '熊本熊部長辦公室', itemNote: '' }
+                ]
+            },
+            {
+                date: '10/18 (日)', shortDate: '10/18', city: '熊本', hotel: '溫馨的家', note: '藥妝補貨返台。',
+                items: [
+                    { id: '901', time: '10:00', type: 'shop', activity: '藥妝大補貨', location: '下通商店街', itemNote: '' },
+                    { id: '902', time: '19:15', type: 'flight', activity: '星宇航空返台', location: '阿蘇熊本機場', itemNote: '' }
+                ]
+            }
+        ];
+
+        const { createApp, ref, computed, watch, onMounted, nextTick } = Vue;
+
+        createApp({
+            setup() {
+                const currentTab = ref('plan');
+                const currentDayIdx = ref(0);
+                const isNoteOpen = ref(false);
+                let mapInstance = null;
+                let mapMarkers = [];
+                let mapPolyline = null;
+
+                const showShareModal = ref(false);
+                const isCloudConnected = ref(false);
+                const copyNotice = ref('');
+                
+                const getInitialTripId = () => {
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const urlTrip = urlParams.get('trip');
+                    if (urlTrip) return urlTrip.trim();
+                    return localStorage.getItem('kyushu_current_trip_id') || 'kyushu-2026-trip';
+                };
+
+                const currentTripId = ref(getInitialTripId());
+                const tripInputCode = ref(currentTripId.value);
+
+                const days = ref(safeParseJSON('kyushu_days_v3', defaultKyushuData));
+                const exchangeRate = ref(parseFloat(localStorage.getItem('kyushu_exchange_rate')) || 0.215);
+                const calcJpyInput = ref(1000);
+                const members = ref(safeParseJSON('kyushu_members', ['小明', '小華', '阿妹']));
+                const expenses = ref(safeParseJSON('kyushu_expenses', [
+                    { id: 1, dayIdx: 4, title: '熊本馬肉料理晚餐', amount: 12000, paidBy: '小華', splitAmong: ['小明', '小華', '阿妹'], category: 'food' },
+                    { id: 2, dayIdx: 3, title: '阿蘇橫斷特急車票', amount: 6500, paidBy: '阿妹', splitAmong: ['小明', '小華'], category: 'transport' }
+                ]));
+
+                const saveDataToCloudAndLocal = () => {
+                    try {
+                        localStorage.setItem('kyushu_days_v3', JSON.stringify(days.value));
+                        localStorage.setItem('kyushu_expenses', JSON.stringify(expenses.value));
+                        localStorage.setItem('kyushu_members', JSON.stringify(members.value));
+                        localStorage.setItem('kyushu_exchange_rate', exchangeRate.value.toString());
+                        localStorage.setItem('kyushu_current_trip_id', currentTripId.value);
+                    } catch (e) {
+                        console.error("Local storage save error:", e);
+                    }
+                };
+
+                const switchTripId = (newCode) => {
+                    if (!newCode || !newCode.trim()) return;
+                    currentTripId.value = newCode.trim();
+                    tripInputCode.value = currentTripId.value;
+                    
+                    const newUrl = new URL(window.location.href);
+                    newUrl.searchParams.set('trip', currentTripId.value);
+                    window.history.replaceState({}, '', newUrl);
+
+                    saveDataToCloudAndLocal();
+                    copyNotice.value = `已切換至代碼：${currentTripId.value}`;
+                    setTimeout(() => { copyNotice.value = ''; }, 3000);
+                };
+
+                const copyShareLink = () => {
+                    const link = `${window.location.origin}${window.location.pathname}?trip=${encodeURIComponent(currentTripId.value)}`;
+                    
+                    const textArea = document.createElement("textarea");
+                    textArea.value = link;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    try {
+                        document.execCommand('copy');
+                        copyNotice.value = "✅ 專屬共用連結已複製！";
+                    } catch (err) {
+                        copyNotice.value = `連結：${link}`;
+                    }
+                    document.body.removeChild(textArea);
+
+                    setTimeout(() => { copyNotice.value = ''; }, 4000);
+                };
+
+                const setExchangeRate = (rate) => {
+                    exchangeRate.value = rate;
+                    saveDataToCloudAndLocal();
+                };
+
+                const calcTwdResult = computed(() => {
+                    const jpy = parseFloat(calcJpyInput.value) || 0;
+                    return Math.round(jpy * exchangeRate.value);
+                });
+
+                const locationGeoMap = {
+                    '大分機場': [33.4794, 131.7347],
+                    '大分JR九州Blossom飯店': [33.2327, 131.6067],
+                    '豐後高田 昭和之町': [33.5562, 131.4428],
+                    '杵築城下町': [33.4158, 131.6186],
+                    '海地獄': [33.3156, 131.4681],
+                    '別府高原駅': [33.2801, 131.4339],
+                    '阿蘇車站': [32.9372, 131.0808],
+                    '草千里': [32.8850, 131.0520],
+                    '白川水源': [32.8256, 131.0772],
+                    '熊本車站': [32.7894, 130.6888],
+                    '熊本城': [32.8062, 130.7058],
+                    '熊本熊部長辦公室': [32.8018, 130.7107],
+                    '久留米車站': [33.3193, 130.5083],
+                    '山鹿老街': [33.0152, 130.6908],
+                    '下通商店街': [32.8002, 130.7082],
+                    '阿蘇熊本機場': [32.8372, 130.8550]
+                };
+
+                const cityGeoMap = {
+                    '大分': { lat: 33.2396, lng: 131.6093 },
+                    '別府': { lat: 33.2794, lng: 131.5011 },
+                    '阿蘇': { lat: 32.9558, lng: 131.0850 },
+                    '熊本': { lat: 32.8032, lng: 130.7079 },
+                    '久留米': { lat: 33.3193, lng: 130.5083 },
+                    '山鹿': { lat: 33.0142, lng: 130.6897 }
+                };
+
+                const currentDayWeather = ref(null);
+
+                const getCategoryIcon = (type) => {
+                    const icons = { spot: 'ph-fill ph-camera', food: 'ph-fill ph-cooking-pot', transport: 'ph-fill ph-train', flight: 'ph-fill ph-airplane-tilt', shop: 'ph-fill ph-shopping-bag' };
+                    return icons[type] || 'ph-fill ph-map-pin';
+                };
+
+                const getCategoryName = (type) => {
+                    const names = { spot: '景點', food: '美食', transport: '交通', flight: '航班', shop: '購物' };
+                    return names[type] || '景點';
+                };
+
+                const getCategoryBgColor = (type) => {
+                    const colors = { spot: 'bg-emerald-100 text-emerald-700', food: 'bg-amber-100 text-amber-700', transport: 'bg-sky-100 text-sky-700', flight: 'bg-blue-100 text-blue-700', shop: 'bg-purple-100 text-purple-700' };
+                    return colors[type] || 'bg-slate-100 text-slate-700';
+                };
+
+                const getCategoryBadgeClass = (type) => {
+                    const badges = { spot: 'bg-emerald-50 text-emerald-800 border-emerald-200', food: 'bg-amber-50 text-amber-800 border-amber-200', transport: 'bg-sky-50 text-sky-800 border-sky-200', flight: 'bg-blue-50 text-blue-800 border-blue-200', shop: 'bg-purple-50 text-purple-800 border-purple-200' };
+                    return badges[type] || 'bg-slate-50 text-slate-800 border-slate-200';
+                };
+
+                const totalExpenses = computed(() => expenses.value.reduce((sum, item) => sum + (parseFloat(item.amount) || 0), 0));
+                const perPersonExpense = computed(() => members.value.length ? Math.round(totalExpenses.value / members.value.length) : 0);
+                const filteredExpenses = computed(() => expenses.value);
+
+                const totalExpensesTwd = computed(() => Math.round(totalExpenses.value * exchangeRate.value));
+                const perPersonExpenseTwd = computed(() => Math.round(perPersonExpense.value * exchangeRate.value));
+
+                const getExpenseOriginalIndex = (exp) => expenses.value.findIndex(e => e === exp);
+
+                const settlements = computed(() => {
+                    const netBalances = {};
+                    members.value.forEach(m => netBalances[m] = 0);
+
+                    expenses.value.forEach(exp => {
+                        const amt = parseFloat(exp.amount) || 0;
+                        if (!amt || !exp.paidBy || !exp.splitAmong) return;
+                        netBalances[exp.paidBy] += amt;
+                        const share = amt / exp.splitAmong.length;
+                        exp.splitAmong.forEach(m => { if (netBalances[m] !== undefined) netBalances[m] -= share; });
+                    });
+
+                    const debtors = [], creditors = [];
+                    for (const [m, bal] of Object.entries(netBalances)) {
+                        if (bal < -1) debtors.push({ member: m, amount: -bal });
+                        else if (bal > 1) creditors.push({ member: m, amount: bal });
+                    }
+
+                    const res = [];
+                    let i = 0, j = 0;
+                    while (i < debtors.length && j < creditors.length) {
+                        const settleAmt = Math.min(debtors[i].amount, creditors[j].amount);
+                        res.push({ from: debtors[i].member, to: creditors[j].member, amount: Math.round(settleAmt) });
+                        debtors[i].amount -= settleAmt;
+                        creditors[j].amount -= settleAmt;
+                        if (debtors[i].amount < 1) i++;
+                        if (creditors[j].amount < 1) j++;
+                    }
+                    return res;
+                });
+
+                const currentDay = computed(() => days.value[currentDayIdx.value] || { items: [], date: '', city: '', note: '' });
+
+                const fetchWeatherForCity = async (cityName) => {
+                    const coords = cityGeoMap[cityName];
+                    if (!coords) return;
+                    try {
+                        const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${coords.lat}&longitude=${coords.lng}&current_weather=true`);
+                        const data = await res.json();
+                        if (data && data.current_weather) {
+                            currentDayWeather.value = { temp: Math.round(data.current_weather.temperature), icon: 'ph-fill ph-sun', desc: '晴朗' };
+                        }
+                    } catch (e) {
+                        currentDayWeather.value = { temp: '22', icon: 'ph-fill ph-sun', desc: '舒適' };
+                    }
+                };
+
+                const renderMapForCurrentDay = async () => {
+                    await nextTick();
+                    const container = document.getElementById('map');
+                    if (!container || typeof L === 'undefined') return;
+
+                    if (!mapInstance) {
+                        mapInstance = L.map('map', { zoomControl: false }).setView([32.8032, 130.7079], 9);
+                        L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', { attribution: '&copy; CARTO' }).addTo(mapInstance);
+                    }
+
+                    mapMarkers.forEach(m => m.remove());
+                    mapMarkers = [];
+                    if (mapPolyline) mapPolyline.remove();
+
+                    const points = [];
+                    const locs = currentDay.value.items.filter(i => i.location);
+
+                    for (const item of locs) {
+                        let coords = locationGeoMap[item.location];
+                        if (coords) {
+                            points.push(coords);
+                            const marker = L.marker(coords).addTo(mapInstance).bindPopup(`<b>${item.activity}</b><br>${item.location}`);
+                            mapMarkers.push(marker);
+                        }
+                    }
+
+                    if (points.length > 0) {
+                        mapPolyline = L.polyline(points, { color: '#4338CA', weight: 4, dashArray: '6, 8' }).addTo(mapInstance);
+                        mapInstance.fitBounds(L.latLngBounds(points), { padding: [40, 40], maxZoom: 14 });
+                    }
+                };
+
+                const switchToMapTab = () => {
+                    currentTab.value = 'map';
+                    setTimeout(() => {
+                        if (mapInstance) mapInstance.invalidateSize();
+                        renderMapForCurrentDay();
+                    }, 150);
+                };
+
+                const getGoogleNavLink = (loc) => loc ? `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(loc)}` : '#';
+
+                const showItineraryModal = ref(false);
+                const editingItineraryIdx = ref(null);
+                const itineraryForm = ref({ time: '', type: 'spot', activity: '', location: '', itemNote: '' });
+
+                const openItineraryModal = (item = null, idx = null) => {
+                    if (item && idx !== null) {
+                        editingItineraryIdx.value = idx;
+                        itineraryForm.value = { ...item };
+                    } else {
+                        editingItineraryIdx.value = null;
+                        itineraryForm.value = { time: '10:00', type: 'spot', activity: '', location: '', itemNote: '' };
+                    }
+                    showItineraryModal.value = true;
+                };
+
+                const saveItineraryItem = () => {
+                    if (!itineraryForm.value.activity) return;
+                    if (editingItineraryIdx.value !== null) {
+                        days.value[currentDayIdx.value].items[editingItineraryIdx.value] = { ...itineraryForm.value };
+                    } else {
+                        days.value[currentDayIdx.value].items.push({ id: Date.now().toString(), ...itineraryForm.value });
+                    }
+                    saveDataToCloudAndLocal();
+                    showItineraryModal.value = false;
+                };
+
+                const deleteItineraryItem = (idx) => {
+                    days.value[currentDayIdx.value].items.splice(idx, 1);
+                    saveDataToCloudAndLocal();
+                };
+
+                const editDayHotel = () => {
+                    const current = days.value[currentDayIdx.value].hotel;
+                    const res = prompt('請輸入此日住宿飯店名稱：', current);
+                    if (res !== null) {
+                        days.value[currentDayIdx.value].hotel = res;
+                        saveDataToCloudAndLocal();
+                    }
+                };
+
+                const showExpenseModal = ref(false);
+                const editingExpenseIdx = ref(null);
+                const expenseForm = ref({ dayIdx: 0, title: '', amount: '', paidBy: members.value[0], splitAmong: [...members.value], category: 'food' });
+
+                const openExpenseModal = (exp = null, idx = null) => {
+                    if (exp && idx !== null && idx >= 0) {
+                        editingExpenseIdx.value = idx;
+                        expenseForm.value = { dayIdx: exp.dayIdx || 0, title: exp.title, amount: exp.amount, paidBy: exp.paidBy, splitAmong: [...exp.splitAmong], category: exp.category };
+                    } else {
+                        editingExpenseIdx.value = null;
+                        expenseForm.value = { dayIdx: currentDayIdx.value, title: '', amount: '', paidBy: members.value[0], splitAmong: [...members.value], category: 'food' };
+                    }
+                    showExpenseModal.value = true;
+                };
+
+                const toggleExpenseMember = (m) => {
+                    const idx = expenseForm.value.splitAmong.indexOf(m);
+                    if (idx >= 0) expenseForm.value.splitAmong.splice(idx, 1);
+                    else expenseForm.value.splitAmong.push(m);
+                };
+
+                const saveExpense = () => {
+                    if (!expenseForm.value.title || !expenseForm.value.amount) return;
+                    if (editingExpenseIdx.value !== null) {
+                        expenses.value[editingExpenseIdx.value] = { id: expenses.value[editingExpenseIdx.value].id, ...expenseForm.value };
+                    } else {
+                        expenses.value.unshift({ id: Date.now(), ...expenseForm.value });
+                    }
+                    saveDataToCloudAndLocal();
+                    showExpenseModal.value = false;
+                };
+
+                const deleteExpense = (idx) => {
+                    if (idx >= 0) {
+                        expenses.value.splice(idx, 1);
+                        saveDataToCloudAndLocal();
+                    }
+                };
+
+                const showMemberModal = ref(false);
+                const newMemberName = ref('');
+                const editingMemberIndex = ref(null);
+                const editMemberNameInput = ref('');
+
+                const openMemberModal = () => { showMemberModal.value = true; };
+                const startEditMember = (i) => { editingMemberIndex.value = i; editMemberNameInput.value = members.value[i]; };
+                const saveEditMember = (i) => {
+                    if (editMemberNameInput.value.trim()) {
+                        members.value[i] = editMemberNameInput.value.trim();
+                        saveDataToCloudAndLocal();
+                    }
+                    editingMemberIndex.value = null;
+                };
+                const addMember = () => {
+                    if (newMemberName.value && !members.value.includes(newMemberName.value)) {
+                        members.value.push(newMemberName.value);
+                        saveDataToCloudAndLocal();
+                        newMemberName.value = '';
+                    }
+                };
+                const removeMember = (idx) => {
+                    members.value.splice(idx, 1);
+                    saveDataToCloudAndLocal();
+                };
+
+                const getExpenseCategoryIcon = (c) => {
+                    const m = { food: 'ph-fill ph-cooking-pot', transport: 'ph-fill ph-train', hotel: 'ph-fill ph-bed', shop: 'ph-fill ph-shopping-bag', ticket: 'ph-fill ph-ticket' };
+                    return m[c] || 'ph-fill ph-receipt';
+                };
+
+                watch(currentDayIdx, (newIdx) => {
+                    fetchWeatherForCity(days.value[newIdx].city);
+                    if (currentTab.value === 'map') renderMapForCurrentDay();
+                });
+
+                onMounted(() => {
+                    fetchWeatherForCity(days.value[0].city);
+                });
+
+                return {
+                    currentTab, currentDayIdx, isNoteOpen, days, currentDay,
+                    totalExpenses, perPersonExpense, settlements, expenses, members,
+                    currentDayWeather, filteredExpenses, getExpenseOriginalIndex,
+                    exchangeRate, calcJpyInput, calcTwdResult, totalExpensesTwd, perPersonExpenseTwd,
+                    setExchangeRate,
+                    getCategoryIcon, getCategoryName, getCategoryBgColor, getCategoryBadgeClass,
+                    getGoogleNavLink, getExpenseCategoryIcon,
+                    switchToMapTab, renderMapForCurrentDay,
+                    showItineraryModal, editingItineraryIdx, itineraryForm, openItineraryModal, saveItineraryItem, deleteItineraryItem, editDayHotel,
+                    showExpenseModal, editingExpenseIdx, expenseForm, openExpenseModal, toggleExpenseMember, saveExpense, deleteExpense,
+                    showMemberModal, newMemberName, editingMemberIndex, editMemberNameInput, openMemberModal, startEditMember, saveEditMember, addMember, removeMember,
+                    saveDataToCloudAndLocal, showShareModal, isCloudConnected, currentTripId, tripInputCode, copyNotice, switchTripId, copyShareLink
+                };
+            }
+        }).mount('#app')
+    </script>
+</body>
+</html>
