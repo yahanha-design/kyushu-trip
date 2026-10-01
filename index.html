@@ -161,7 +161,6 @@
 
     <div id="app" class="w-full h-full bg-slate-50 flex flex-col overflow-hidden relative border-0 md:max-w-md md:h-[95vh] md:rounded-3xl md:shadow-2xl md:border md:border-slate-800">
 
-        <!-- Top Header Navigation Bar -->
         <header class="bg-slate-900 text-white shrink-0 z-20 px-3.5 shadow-md border-b border-slate-800 header-safe-top">
             <div class="flex items-center justify-between gap-2">
                 <div class="flex items-center gap-2 min-w-0">
@@ -209,7 +208,7 @@
                         <i class="ph-bold ph-translate text-xs"></i>
                     </a>
 
-                    <a href="https://lens.google.com/" target="_blank" title="Google 智慧鏡頭搜尋" class="bg-slate-800 hover:bg-slate-700 text-white font-extrabold px-2 py-1.5 rounded-full text-xs flex items-center gap-1 btn-bounce border border-slate-700">
+                    <a href="https://lens.google.com/" target="_blank" rel="noopener noreferrer" title="Google 智慧鏡頭搜尋" class="bg-slate-800 hover:bg-slate-700 text-white font-extrabold px-2 py-1.5 rounded-full text-xs flex items-center gap-1 btn-bounce border border-slate-700">
                         <i class="ph-bold ph-camera text-xs"></i>
                     </a>
 
@@ -381,7 +380,6 @@
                 </div>
             </transition>
 
-            <!-- 2️⃣ Google Maps Embed View with Daily Location List (Map Tab) -->
             <transition name="fade" mode="out-in">
                 <div v-show="currentTab === 'map'" class="space-y-3">
                     <div class="bg-white p-3 rounded-2xl shadow-2xs border border-slate-200">
@@ -429,7 +427,6 @@
                 </div>
             </transition>
 
-            <!-- 3️⃣ 分帳記帳視圖 (Expense Tab) -->
             <transition name="fade" mode="out-in">
                 <div v-if="currentTab === 'expense'" class="space-y-4 relative min-h-full">
                     <div class="bg-gradient-to-br from-slate-900 via-slate-800 to-zinc-900 text-white rounded-2xl p-4 shadow-md border border-slate-700 space-y-3">
@@ -564,81 +561,36 @@
                 </div>
             </transition>
 
-            <!-- 4️⃣ 準備與會話視圖 (Checklist & Japanese Phrases) -->
             <transition name="fade" mode="out-in">
                 <div v-if="currentTab === 'checklist'" class="space-y-4 relative min-h-full">
                     
-                    <!-- Google Translate Quick Access Card -->
+                    <!-- Google Translate Quick Access Card (with fixed Lens mobile link) -->
                     <div class="bg-gradient-to-br from-indigo-900 via-indigo-950 to-slate-900 text-white p-4 rounded-2xl shadow-md border border-indigo-800 space-y-3">
                         <div class="flex items-center justify-between pb-2 border-b border-indigo-800/80">
                             <div class="flex items-center gap-2">
                                 <div class="w-8 h-8 rounded-xl bg-indigo-600 flex items-center justify-center text-white">
                                     <i class="ph-bold ph-translate text-base"></i>
                                 </div>
-                                <h3 class="text-xs font-black tracking-wide">Google 翻譯與鏡頭搜尋</h3>
+                                <h3 class="text-xs font-black tracking-wide">Google 翻譯與智慧鏡頭搜圖</h3>
                             </div>
                             <span class="text-[10px] bg-indigo-500/30 text-indigo-200 px-2 py-0.5 rounded-full border border-indigo-400/30 font-bold">即時對話/以圖搜圖</span>
                         </div>
                         <p class="text-[11px] text-indigo-200 leading-relaxed font-bold">
-                            點擊下方按鈕可開啟 Google 翻譯或連結至 Google 智慧鏡頭（Lens），進行拍照翻譯菜單或圖片搜尋！
+                            手機連線建議：若直接點擊智慧鏡頭無法載入，請確認已安裝 Google App 或使用下方專屬網頁連結進行拍照/截圖搜尋：
                         </p>
                         <div class="grid grid-cols-2 gap-2 pt-1">
-                            <a href="https://translate.google.com/?sl=ja&tl=zh-TW&op=translate" target="_blank" class="bg-indigo-600 hover:bg-indigo-500 text-white font-black py-2.5 px-3 rounded-xl text-xs flex items-center justify-center gap-1.5 btn-bounce border border-indigo-400/40 shadow-xs">
+                            <a href="https://translate.google.com/?sl=ja&tl=zh-TW&op=translate" target="_blank" rel="noopener noreferrer" class="bg-indigo-600 hover:bg-indigo-500 text-white font-black py-2.5 px-3 rounded-xl text-xs flex items-center justify-center gap-1.5 btn-bounce border border-indigo-400/40 shadow-xs">
                                 <i class="ph-bold ph-chat-text text-sm"></i>
                                 <span>開啟文字翻譯</span>
                             </a>
-                            <a href="https://lens.google.com/" target="_blank" class="bg-white/10 hover:bg-white/20 text-white font-black py-2.5 px-3 rounded-xl text-xs flex items-center justify-center gap-1.5 btn-bounce border border-white/20 shadow-xs">
+                            <a href="https://lens.google.com/" target="_blank" rel="noopener noreferrer" class="bg-white/10 hover:bg-white/20 text-white font-black py-2.5 px-3 rounded-xl text-xs flex items-center justify-center gap-1.5 btn-bounce border border-white/20 shadow-xs">
                                 <i class="ph-bold ph-camera text-sm"></i>
                                 <span>智慧鏡頭搜圖</span>
                             </a>
                         </div>
                     </div>
 
-                    <!-- Checklist Progress -->
-                    <div class="bg-white p-4 rounded-2xl shadow-2xs border border-slate-200 space-y-3">
-                        <div class="flex justify-between items-center">
-                            <h3 class="text-xs font-black text-slate-900 flex items-center gap-1.5">
-                                <i class="ph-fill ph-check-square-offset text-indigo-600 text-base"></i>
-                                <span>行前準備與必帶清單</span>
-                            </h3>
-                            <span class="text-xs font-black text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-full border border-indigo-200">
-                                {{ checkedPackingCount }} / {{ packingList.length }}
-                            </span>
-                        </div>
-
-                        <div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
-                            <div class="bg-indigo-600 h-2 rounded-full transition-all duration-300" :style="{ width: packingProgressPercent + '%' }"></div>
-                        </div>
-
-                        <div class="space-y-2 pt-1">
-                            <div v-for="(item, idx) in packingList" :key="idx" 
-                                 :class="item.done ? 'bg-indigo-50/80 border-indigo-200 text-indigo-950' : 'bg-slate-50 border-slate-200 text-slate-800'"
-                                 class="p-2.5 rounded-xl border text-xs font-bold flex items-center justify-between gap-2">
-                                
-                                <div @click="togglePackingItem(idx)" class="flex items-center gap-2 cursor-pointer flex-1 min-w-0" :class="{ 'line-through': item.done }">
-                                    <i :class="item.done ? 'ph-fill ph-check-circle text-indigo-600' : 'ph-bold ph-circle text-slate-400'" class="text-base shrink-0"></i>
-                                    <span class="truncate">{{ item.text }}</span>
-                                </div>
-
-                                <div class="flex items-center gap-1.5 shrink-0">
-                                    <select v-model="item.category" @change="saveDataToCloudAndLocal" class="bg-white border border-slate-200 text-[10px] text-slate-700 font-bold px-1.5 py-0.5 rounded shadow-2xs focus:outline-none focus:border-indigo-500">
-                                        <option v-for="cat in packingCategories" :key="cat" :value="cat">{{ cat }}</option>
-                                    </select>
-                                    <button @click="removePackingItem(idx)" class="text-slate-400 hover:text-red-500 font-bold px-1">✕</button>
-                                </div>
-                            </div>
-
-                            <div class="flex gap-1.5 pt-2 border-t border-slate-100">
-                                <input v-model="newPackingItemText" type="text" placeholder="新增準備項目..." class="flex-1 px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold focus:outline-none focus:border-indigo-500">
-                                <select v-model="newPackingItemCategory" class="bg-slate-50 border border-slate-200 text-xs font-bold px-2 py-1.5 rounded-xl">
-                                    <option v-for="cat in packingCategories" :key="cat" :value="cat">{{ cat }}</option>
-                                </select>
-                                <button @click="addPackingItem" class="bg-indigo-600 text-white font-black text-xs px-3 py-1.5 rounded-xl btn-bounce shrink-0">+ 新增</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Japanese Travel Voice Phrases -->
+                    <!-- Japanese Travel Voice Phrases (Updated with requested phrases) -->
                     <div class="bg-white p-4 rounded-2xl shadow-2xs border border-slate-200 space-y-3">
                         <div class="flex justify-between items-center pb-2 border-b border-slate-100">
                             <h3 class="text-xs font-black text-slate-900 flex items-center gap-1.5">
@@ -668,7 +620,6 @@
 
         </main>
 
-        <!-- Bottom Navigation Bar -->
         <nav class="absolute bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-200 px-3 py-2 flex justify-around items-center z-30 pb-safe">
             <button @click="currentTab = 'plan'" :class="currentTab === 'plan' ? 'text-indigo-600 scale-105' : 'text-slate-400'" class="flex flex-col items-center gap-0.5 btn-bounce">
                 <i :class="currentTab === 'plan' ? 'ph-fill ph-calendar-check' : 'ph-bold ph-calendar'" class="text-xl"></i>
@@ -686,8 +637,8 @@
             </button>
 
             <button @click="currentTab = 'checklist'" :class="currentTab === 'checklist' ? 'text-emerald-600 scale-105' : 'text-slate-400'" class="flex flex-col items-center gap-0.5 btn-bounce">
-                <i :class="currentTab === 'checklist' ? 'ph-fill ph-list-checks' : 'ph-bold ph-list-checks'" class="text-xl"></i>
-                <span class="text-[11px] font-black">準備/日語</span>
+                <i :class="currentTab === 'checklist' ? 'ph-fill ph-translate' : 'ph-bold ph-translate'" class="text-xl"></i>
+                <span class="text-[11px] font-black">實用日文</span>
             </button>
         </nav>
 
@@ -951,7 +902,6 @@
             }
         }
 
-        // Updated exactly from user's image table data
         const defaultKyushuData = [
             {
                 date: '10/10 (六)', shortDate: '10/10', city: '大分', hotel: '大分JR飯店', transportPass: '大分機場巴士 / 氣墊船',
@@ -1025,22 +975,16 @@
             }
         ];
 
-        const defaultPackingList = [
-            { text: '護照 (確認6個月以上有效期)', category: '重要證件', done: false },
-            { text: '日本 Visit Japan Web 填寫 completed', category: '重要證件', done: false },
-            { text: 'JR Kyushu Pass 兌換券/實體票', category: '交通票卷', done: false },
-            { text: '日圓現金 & 信用卡 (海外高回饋)', category: '金錢', done: false },
-            { text: '日本 e-SIM 或網卡', category: '通訊', done: false },
-            { text: '行動電源 & 充電線', category: '電子3C', done: false },
-            { text: '保暖外套 (阿蘇山上較冷)', category: '衣物', done: false },
-            { text: '常用個人藥品 & 空瓶 (裝白川水源水)', category: '個人用品', done: false }
-        ];
-
+        // Updated Japanese phrases with all requested items:
+        // - 請給我菜單, 結帳, 請給我常溫水, 請問有什麼推薦的嗎？, 請給我這個（搭配指菜單）
         const defaultJapanesePhrases = [
             { zh: '不好意思 / 請問...', ja: 'すみません', roma: 'Sumimasen' },
-            { zh: '請給我這個', ja: 'これをください', roma: 'Kore o kudasai' },
-            { zh: '請問多少錢？', ja: 'いくらですか？', roma: 'Ikura desu ka?' },
+            { zh: '請給我菜單', ja: 'メニューをいただけますか', roma: 'Menū o itadakemasu ka?' },
+            { zh: '請給我這個（搭配指菜單）', ja: 'これをください', roma: 'Kore o kudasai' },
+            { zh: '請問有什麼推薦的嗎？', ja: 'おすすめは何ですか？', roma: 'Osusume wa nan desu ka?' },
+            { zh: '請給我常溫水', ja: '常温のお水をいただけますか', roma: 'Jōon no o-mizu o itadakemasu ka?' },
             { zh: '我要結帳', ja: 'お会計をお願いします', roma: 'O-kaikei o onegai shimasu' },
+            { zh: '請問多少錢？', ja: 'いくらですか？', roma: 'Ikura desu ka?' },
             { zh: '可以辦理免稅嗎？', ja: '免税できますか？', roma: 'Menzei dekimasu ka?' },
             { zh: '洗手間在哪裡？', ja: 'お手洗いはどこですか？', roma: 'Oterai wa doko desu ka?' },
             { zh: '謝謝！', ja: 'ありがとうございます', roma: 'Arigatou gozaimasu' }
@@ -1064,7 +1008,7 @@
                 const authErrorMsg = ref('');
 
                 const handleLogin = () => {
-                    if (passwordInput.value === '1234') { // 預設密碼 1234
+                    if (passwordInput.value === '1234') {
                         isLoggedIn.value = true;
                         localStorage.setItem('kyushu_is_logged_in', 'true');
                         showAuthModal.value = false;
@@ -1107,10 +1051,6 @@
                     { id: 1, dayIdx: 3, title: '阿蘇草千里午餐', amount: 12000, paidBy: '小華', splitAmong: ['小明', '小華', '阿妹'], category: 'food' },
                     { id: 2, dayIdx: 2, title: '別府纜車往返門票', amount: 5400, paidBy: '阿妹', splitAmong: ['小明', '小華'], category: 'ticket' }
                 ]));
-                const packingList = ref(safeParseJSON('kyushu_packing_list', defaultPackingList));
-                const packingCategories = ref(['重要證件', '交通票卷', '金錢', '通訊', '電子3C', '衣物', '個人用品', '其他']);
-                const newPackingItemText = ref('');
-                const newPackingItemCategory = ref('重要證件');
                 const japanesePhrases = ref(defaultJapanesePhrases);
 
                 const syncChannel = new BroadcastChannel('kyushu_trip_channel');
@@ -1121,7 +1061,6 @@
                         localStorage.setItem('kyushu_expenses', JSON.stringify(expenses.value));
                         localStorage.setItem('kyushu_members', JSON.stringify(members.value));
                         localStorage.setItem('kyushu_exchange_rate', exchangeRate.value.toString());
-                        localStorage.setItem('kyushu_packing_list', JSON.stringify(packingList.value));
                         localStorage.setItem('kyushu_current_trip_id', currentTripId.value);
 
                         if (broadcast) {
@@ -1144,7 +1083,6 @@
                         expenses.value = safeParseJSON('kyushu_expenses', expenses.value);
                         members.value = safeParseJSON('kyushu_members', members.value);
                         exchangeRate.value = parseFloat(localStorage.getItem('kyushu_exchange_rate')) || 0.215;
-                        packingList.value = safeParseJSON('kyushu_packing_list', packingList.value);
                     }
                 };
 
@@ -1236,7 +1174,6 @@
 
                 const currentDayWeather = ref(null);
 
-                // Computed unique locations for the current day for map navigation pills
                 const currentDayLocations = computed(() => {
                     const day = currentDay.value;
                     if (!day || !day.items) return [];
@@ -1248,7 +1185,6 @@
                     return locs;
                 });
 
-                // Google Maps Embed & Search URLs computed based on current day city or primary item location
                 const currentGoogleMapEmbedUrl = computed(() => {
                     const day = currentDay.value;
                     const primaryLoc = day && day.items && day.items[0] && day.items[0].location ? day.items[0].location : (day ? day.city : '九州');
@@ -1323,30 +1259,6 @@
                 });
 
                 const currentDay = computed(() => days.value[currentDayIdx.value] || { items: [], date: '', city: '', note: '' });
-
-                const checkedPackingCount = computed(() => packingList.value.filter(i => i.done).length);
-                const packingProgressPercent = computed(() => packingList.value.length ? Math.round((checkedPackingCount.value / packingList.value.length) * 100) : 0);
-
-                const togglePackingItem = (idx) => {
-                    packingList.value[idx].done = !packingList.value[idx].done;
-                    saveDataToCloudAndLocal();
-                };
-
-                const addPackingItem = () => {
-                    if (!newPackingItemText.value.trim()) return;
-                    packingList.value.push({
-                        text: newPackingItemText.value.trim(),
-                        category: newPackingItemCategory.value,
-                        done: false
-                    });
-                    newPackingItemText.value = '';
-                    saveDataToCloudAndLocal();
-                };
-
-                const removePackingItem = (idx) => {
-                    packingList.value.splice(idx, 1);
-                    saveDataToCloudAndLocal();
-                };
 
                 const speakJapanese = (text) => {
                     if ('speechSynthesis' in window) {
@@ -1443,14 +1355,17 @@
 
                 const toggleExpenseMember = (m) => {
                     const idx = expenseForm.value.splitAmong.indexOf(m);
-                    if (idx >= 0) expenseForm.value.splitAmong.splice(idx, 1);
-                    else expenseForm.value.splitAmong.push(m);
+                    if (idx > -1) {
+                        if (expenseForm.value.splitAmong.length > 1) expenseForm.value.splitAmong.splice(idx, 1);
+                    } else {
+                        expenseForm.value.splitAmong.push(m);
+                    }
                 };
 
                 const saveExpense = () => {
                     if (!expenseForm.value.title || !expenseForm.value.amount) return;
-                    if (editingExpenseIdx.value !== null) {
-                        expenses.value[editingExpenseIdx.value] = { id: expenses.value[editingExpenseIdx.value].id, ...expenseForm.value };
+                    if (editingExpenseIdx.value !== null && editingExpenseIdx.value >= 0) {
+                        expenses.value[editingExpenseIdx.value] = { ...expenseForm.value };
                     } else {
                         expenses.value.unshift({ id: Date.now(), ...expenseForm.value });
                     }
@@ -1465,64 +1380,73 @@
                     }
                 };
 
+                const getExpenseCategoryIcon = (cat) => {
+                    const icons = { food: 'ph-fill ph-cooking-pot', transport: 'ph-fill ph-train', hotel: 'ph-fill ph-bed', shop: 'ph-fill ph-shopping-bag', ticket: 'ph-fill ph-ticket' };
+                    return icons[cat] || 'ph-fill ph-wallet';
+                };
+
                 const showMemberModal = ref(false);
                 const newMemberName = ref('');
                 const editingMemberIndex = ref(null);
                 const editMemberNameInput = ref('');
 
                 const openMemberModal = () => { showMemberModal.value = true; };
-                const startEditMember = (i) => { editingMemberIndex.value = i; editMemberNameInput.value = members.value[i]; };
+                const addMember = () => {
+                    if (!newMemberName.value.trim()) return;
+                    const name = newMemberName.value.trim();
+                    if (!members.value.includes(name)) {
+                        members.value.push(name);
+                        expenses.value.forEach(exp => { if (!exp.splitAmong.includes(name)) exp.splitAmong.push(name); });
+                        saveDataToCloudAndLocal();
+                    }
+                    newMemberName.value = '';
+                };
+                const removeMember = (idx) => {
+                    if (members.value.length <= 1) return;
+                    const removed = members.value.splice(idx, 1)[0];
+                    saveDataToCloudAndLocal();
+                };
+                const startEditMember = (i) => {
+                    editingMemberIndex.value = i;
+                    editMemberNameInput.value = members.value[i];
+                };
                 const saveEditMember = (i) => {
-                    if (editMemberNameInput.value.trim()) {
-                        members.value[i] = editMemberNameInput.value.trim();
+                    const newName = editMemberNameInput.value.trim();
+                    if (newName && !members.value.includes(newName)) {
+                        const oldName = members.value[i];
+                        members.value[i] = newName;
+                        expenses.value.forEach(exp => {
+                            if (exp.paidBy === oldName) exp.paidBy = newName;
+                            const sIdx = exp.splitAmong.indexOf(oldName);
+                            if (sIdx > -1) exp.splitAmong[sIdx] = newName;
+                        });
                         saveDataToCloudAndLocal();
                     }
                     editingMemberIndex.value = null;
                 };
-                const addMember = () => {
-                    if (newMemberName.value && !members.value.includes(newMemberName.value)) {
-                        members.value.push(newMemberName.value);
-                        saveDataToCloudAndLocal();
-                        newMemberName.value = '';
-                    }
-                };
-                const removeMember = (idx) => {
-                    members.value.splice(idx, 1);
-                    saveDataToCloudAndLocal();
-                };
-
-                const getExpenseCategoryIcon = (c) => {
-                    const m = { food: 'ph-fill ph-cooking-pot', transport: 'ph-fill ph-train', hotel: 'ph-fill ph-bed', shop: 'ph-fill ph-shopping-bag', ticket: 'ph-fill ph-ticket' };
-                    return m[c] || 'ph-fill ph-receipt';
-                };
 
                 watch(currentDayIdx, (newIdx) => {
-                    fetchWeatherForCity(days.value[newIdx].city);
-                });
-
-                onMounted(() => {
-                    fetchWeatherForCity(days.value[0].city);
-                });
+                    const city = days.value[newIdx].city;
+                    fetchWeatherForCity(city);
+                }, { immediate: true });
 
                 return {
-                    currentTab, currentDayIdx, isNoteOpen, days, currentDay,
-                    totalExpenses, perPersonExpense, settlements, expenses, members,
-                    currentDayWeather, filteredExpenses, getExpenseOriginalIndex,
-                    exchangeRate, calcJpyInput, calcTwdResult, totalExpensesTwd, perPersonExpenseTwd,
-                    setExchangeRate, packingList, checkedPackingCount, packingProgressPercent, togglePackingItem,
-                    packingCategories, newPackingItemText, newPackingItemCategory, addPackingItem, removePackingItem,
-                    japanesePhrases, speakJapanese, copyLineItineraryText, manualSaveData,
-                    getCategoryIcon, getCategoryName, getCategoryBgColor, getCategoryBadgeClass,
-                    getGoogleNavLink, getExpenseCategoryIcon, moveItineraryItem,
-                    currentDayLocations, currentGoogleMapEmbedUrl, currentGoogleSearchUrl,
+                    currentTab, currentDayIdx, days, currentDay, isNoteOpen,
+                    showShareModal, copyNotice, currentTripId, tripInputCode, switchTripId, copyShareLink, copyLineItineraryText, manualSaveData,
+                    isLoggedIn, showAuthModal, passwordInput, authErrorMsg, handleLogin, handleLogout,
+                    exchangeRate, setExchangeRate, calcJpyInput, calcTwdResult, members, expenses,
+                    totalExpenses, perPersonExpense, filteredExpenses, totalExpensesTwd, perPersonExpenseTwd,
+                    getExpenseOriginalIndex, settlements,
+                    japanesePhrases, speakJapanese,
+                    currentDayWeather, currentDayLocations, currentGoogleMapEmbedUrl, currentGoogleSearchUrl,
+                    getCategoryIcon, getCategoryName, getCategoryBgColor, getCategoryBadgeClass, getGoogleNavLink,
+                    moveItineraryItem,
                     showItineraryModal, editingItineraryIdx, itineraryForm, openItineraryModal, saveItineraryItem, deleteItineraryItem, editDayHotel,
-                    showExpenseModal, editingExpenseIdx, expenseForm, openExpenseModal, toggleExpenseMember, saveExpense, deleteExpense,
-                    showMemberModal, newMemberName, editingMemberIndex, editMemberNameInput, openMemberModal, startEditMember, saveEditMember, addMember, removeMember,
-                    saveDataToCloudAndLocal, showShareModal, currentTripId, tripInputCode, copyNotice, switchTripId, copyShareLink,
-                    isLoggedIn, showAuthModal, passwordInput, authErrorMsg, handleLogin, handleLogout
+                    showExpenseModal, editingExpenseIdx, expenseForm, openExpenseModal, toggleExpenseMember, saveExpense, deleteExpense, getExpenseCategoryIcon,
+                    showMemberModal, newMemberName, openMemberModal, addMember, removeMember, editingMemberIndex, editMemberNameInput, startEditMember, saveEditMember
                 };
             }
-        }).mount('#app')
+        }).mount('#app');
     </script>
 </body>
 </html>
