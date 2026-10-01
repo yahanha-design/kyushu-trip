@@ -195,6 +195,11 @@
                 </div>
                 
                 <div class="flex items-center gap-1 shrink-0">
+                    <button @click="showAuthModal = true" class="px-2.5 py-1.5 rounded-full text-xs font-black flex items-center gap-1 btn-bounce border shadow-xs" :class="isLoggedIn ? 'bg-emerald-600 border-emerald-400/40 text-white' : 'bg-slate-800 border-slate-700 text-slate-300'">
+                        <i class="ph-bold" :class="isLoggedIn ? 'ph-lock-key-open' : 'ph-lock-key'"></i>
+                        <span>{{ isLoggedIn ? '已解鎖' : '登入' }}</span>
+                    </button>
+
                     <button @click="showShareModal = true" title="多人共用與匯出" class="bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold px-2.5 py-1.5 rounded-full text-xs flex items-center gap-1 btn-bounce border border-indigo-400/40 shadow-xs">
                         <i class="ph-bold ph-share-network text-xs"></i>
                         <span>共用</span>
@@ -204,8 +209,8 @@
                         <i class="ph-bold ph-translate text-xs"></i>
                     </a>
 
-                    <a href="https://images.google.com/" target="_blank" title="Google 圖片以圖搜圖" class="bg-slate-800 hover:bg-slate-700 text-white font-extrabold px-2 py-1.5 rounded-full text-xs flex items-center gap-1 btn-bounce border border-slate-700">
-                        <i class="ph-bold ph-image text-xs"></i>
+                    <a href="https://lens.google.com/" target="_blank" title="Google 智慧鏡頭搜尋" class="bg-slate-800 hover:bg-slate-700 text-white font-extrabold px-2 py-1.5 rounded-full text-xs flex items-center gap-1 btn-bounce border border-slate-700">
+                        <i class="ph-bold ph-camera text-xs"></i>
                     </a>
 
                     <button v-if="currentTab === 'plan'" @click="openItineraryModal()" class="bg-white/10 hover:bg-white/20 text-white font-black px-2 py-1.5 rounded-full text-xs flex items-center gap-1 btn-bounce border border-white/15">
@@ -570,21 +575,21 @@
                                 <div class="w-8 h-8 rounded-xl bg-indigo-600 flex items-center justify-center text-white">
                                     <i class="ph-bold ph-translate text-base"></i>
                                 </div>
-                                <h3 class="text-xs font-black tracking-wide">Google 翻譯隨身通</h3>
+                                <h3 class="text-xs font-black tracking-wide">Google 翻譯與鏡頭搜尋</h3>
                             </div>
-                            <span class="text-[10px] bg-indigo-500/30 text-indigo-200 px-2 py-0.5 rounded-full border border-indigo-400/30 font-bold">即時對話/拍照</span>
+                            <span class="text-[10px] bg-indigo-500/30 text-indigo-200 px-2 py-0.5 rounded-full border border-indigo-400/30 font-bold">即時對話/以圖搜圖</span>
                         </div>
                         <p class="text-[11px] text-indigo-200 leading-relaxed font-bold">
-                            點擊下方按鈕可快速開啟 Google 翻譯網頁，支援<b>相機拍照翻譯菜單</b>、<b>雙向語音對話</b>與文字互譯！
+                            點擊下方按鈕可開啟 Google 翻譯或連結至 Google 智慧鏡頭（Lens），進行拍照翻譯菜單或圖片搜尋！
                         </p>
                         <div class="grid grid-cols-2 gap-2 pt-1">
                             <a href="https://translate.google.com/?sl=ja&tl=zh-TW&op=translate" target="_blank" class="bg-indigo-600 hover:bg-indigo-500 text-white font-black py-2.5 px-3 rounded-xl text-xs flex items-center justify-center gap-1.5 btn-bounce border border-indigo-400/40 shadow-xs">
                                 <i class="ph-bold ph-chat-text text-sm"></i>
                                 <span>開啟文字翻譯</span>
                             </a>
-                            <a href="https://translate.google.com/?sl=ja&tl=zh-TW&op=images" target="_blank" class="bg-white/10 hover:bg-white/20 text-white font-black py-2.5 px-3 rounded-xl text-xs flex items-center justify-center gap-1.5 btn-bounce border border-white/20 shadow-xs">
+                            <a href="https://lens.google.com/" target="_blank" class="bg-white/10 hover:bg-white/20 text-white font-black py-2.5 px-3 rounded-xl text-xs flex items-center justify-center gap-1.5 btn-bounce border border-white/20 shadow-xs">
                                 <i class="ph-bold ph-camera text-sm"></i>
-                                <span>拍照翻譯菜單</span>
+                                <span>智慧鏡頭搜圖</span>
                             </a>
                         </div>
                     </div>
@@ -605,16 +610,30 @@
                             <div class="bg-indigo-600 h-2 rounded-full transition-all duration-300" :style="{ width: packingProgressPercent + '%' }"></div>
                         </div>
 
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
+                        <div class="space-y-2 pt-1">
                             <div v-for="(item, idx) in packingList" :key="idx" 
-                                 @click="togglePackingItem(idx)"
-                                 :class="item.done ? 'bg-indigo-50/80 border-indigo-200 text-indigo-950 line-through' : 'bg-slate-50 border-slate-200 text-slate-800'"
-                                 class="p-2.5 rounded-xl border text-xs font-bold flex items-center justify-between cursor-pointer btn-bounce">
-                                <span class="flex items-center gap-2">
-                                    <i :class="item.done ? 'ph-fill ph-check-circle text-indigo-600' : 'ph-bold ph-circle text-slate-400'" class="text-base"></i>
-                                    <span>{{ item.text }}</span>
-                                </span>
-                                <span class="text-[10px] text-slate-500 font-normal bg-white/80 px-1.5 py-0.5 rounded border border-slate-200">{{ item.category }}</span>
+                                 :class="item.done ? 'bg-indigo-50/80 border-indigo-200 text-indigo-950' : 'bg-slate-50 border-slate-200 text-slate-800'"
+                                 class="p-2.5 rounded-xl border text-xs font-bold flex items-center justify-between gap-2">
+                                
+                                <div @click="togglePackingItem(idx)" class="flex items-center gap-2 cursor-pointer flex-1 min-w-0" :class="{ 'line-through': item.done }">
+                                    <i :class="item.done ? 'ph-fill ph-check-circle text-indigo-600' : 'ph-bold ph-circle text-slate-400'" class="text-base shrink-0"></i>
+                                    <span class="truncate">{{ item.text }}</span>
+                                </div>
+
+                                <div class="flex items-center gap-1.5 shrink-0">
+                                    <select v-model="item.category" @change="saveDataToCloudAndLocal" class="bg-white border border-slate-200 text-[10px] text-slate-700 font-bold px-1.5 py-0.5 rounded shadow-2xs focus:outline-none focus:border-indigo-500">
+                                        <option v-for="cat in packingCategories" :key="cat" :value="cat">{{ cat }}</option>
+                                    </select>
+                                    <button @click="removePackingItem(idx)" class="text-slate-400 hover:text-red-500 font-bold px-1">✕</button>
+                                </div>
+                            </div>
+
+                            <div class="flex gap-1.5 pt-2 border-t border-slate-100">
+                                <input v-model="newPackingItemText" type="text" placeholder="新增準備項目..." class="flex-1 px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold focus:outline-none focus:border-indigo-500">
+                                <select v-model="newPackingItemCategory" class="bg-slate-50 border border-slate-200 text-xs font-bold px-2 py-1.5 rounded-xl">
+                                    <option v-for="cat in packingCategories" :key="cat" :value="cat">{{ cat }}</option>
+                                </select>
+                                <button @click="addPackingItem" class="bg-indigo-600 text-white font-black text-xs px-3 py-1.5 rounded-xl btn-bounce shrink-0">+ 新增</button>
                             </div>
                         </div>
                     </div>
@@ -671,6 +690,42 @@
                 <span class="text-[11px] font-black">準備/日語</span>
             </button>
         </nav>
+
+        <!-- 🔒 Login/Auth Modal -->
+        <transition name="fade">
+            <div v-if="showAuthModal" class="absolute inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+                <div class="bg-white w-full max-w-xs rounded-3xl p-5 space-y-4 shadow-2xl border border-slate-200">
+                    <div class="flex justify-between items-center pb-2 border-b border-slate-200">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-xl bg-indigo-100 text-indigo-700 flex items-center justify-center">
+                                <i class="ph-bold ph-lock-key text-lg"></i>
+                            </div>
+                            <h3 class="text-base font-black text-slate-900">行程編輯權限鎖定</h3>
+                        </div>
+                        <button @click="showAuthModal = false" class="w-7 h-7 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center font-black">✕</button>
+                    </div>
+
+                    <div v-if="!isLoggedIn" class="space-y-3 text-xs">
+                        <p class="text-slate-600 font-bold leading-relaxed">
+                            行程內容目前處於唯讀狀態。請輸入密碼以解鎖修改權限：
+                        </p>
+                        <div>
+                            <input v-model="passwordInput" type="password" placeholder="預設密碼：1234" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl font-black text-slate-800 focus:outline-none focus:border-indigo-600" @keyup.enter="handleLogin">
+                        </div>
+                        <button @click="handleLogin" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-black rounded-xl shadow-xs btn-bounce">
+                            登入解鎖
+                        </button>
+                        <p v-if="authErrorMsg" class="text-red-500 font-bold text-center mt-1">{{ authErrorMsg }}</p>
+                    </div>
+                    <div v-else class="space-y-3 text-xs text-center">
+                        <p class="text-emerald-600 font-black text-sm">✓ 已成功登入並獲得修改權限</p>
+                        <button @click="handleLogout" class="w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-black rounded-xl btn-bounce">
+                            退出登入狀態
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </transition>
 
         <!-- 🌐 Cloud Share & Export Modal -->
         <transition name="fade">
@@ -1001,6 +1056,38 @@
 
                 const showShareModal = ref(false);
                 const copyNotice = ref('');
+
+                // Auth state
+                const isLoggedIn = ref(localStorage.getItem('kyushu_is_logged_in') === 'true');
+                const showAuthModal = ref(false);
+                const passwordInput = ref('');
+                const authErrorMsg = ref('');
+
+                const handleLogin = () => {
+                    if (passwordInput.value === '1234') { // 預設密碼 1234
+                        isLoggedIn.value = true;
+                        localStorage.setItem('kyushu_is_logged_in', 'true');
+                        showAuthModal.value = false;
+                        passwordInput.value = '';
+                        authErrorMsg.value = '';
+                    } else {
+                        authErrorMsg.value = '密碼錯誤！';
+                    }
+                };
+
+                const handleLogout = () => {
+                    isLoggedIn.value = false;
+                    localStorage.removeItem('kyushu_is_logged_in');
+                    showAuthModal.value = false;
+                };
+
+                const checkAuth = () => {
+                    if (!isLoggedIn.value) {
+                        showAuthModal.value = true;
+                        return false;
+                    }
+                    return true;
+                };
                 
                 const getInitialTripId = () => {
                     const urlParams = new URLSearchParams(window.location.search);
@@ -1021,6 +1108,9 @@
                     { id: 2, dayIdx: 2, title: '別府纜車往返門票', amount: 5400, paidBy: '阿妹', splitAmong: ['小明', '小華'], category: 'ticket' }
                 ]));
                 const packingList = ref(safeParseJSON('kyushu_packing_list', defaultPackingList));
+                const packingCategories = ref(['重要證件', '交通票卷', '金錢', '通訊', '電子3C', '衣物', '個人用品', '其他']);
+                const newPackingItemText = ref('');
+                const newPackingItemCategory = ref('重要證件');
                 const japanesePhrases = ref(defaultJapanesePhrases);
 
                 const syncChannel = new BroadcastChannel('kyushu_trip_channel');
@@ -1059,6 +1149,7 @@
                 };
 
                 const moveItineraryItem = (idx, direction) => {
+                    if (!checkAuth()) return;
                     const items = days.value[currentDayIdx.value].items;
                     const targetIdx = idx + direction;
                     if (targetIdx < 0 || targetIdx >= items.length) return;
@@ -1131,46 +1222,6 @@
                     }
                     document.body.removeChild(textArea);
                     setTimeout(() => { copyNotice.value = ''; }, 4000);
-                };
-
-                const exportBackupJson = () => {
-                    const backupData = {
-                        tripId: currentTripId.value,
-                        days: days.value,
-                        expenses: expenses.value,
-                        members: members.value,
-                        exchangeRate: exchangeRate.value,
-                        packingList: packingList.value
-                    };
-                    const blob = new Blob([JSON.stringify(backupData, null, 2)], { type: 'application/json' });
-                    const url = URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = `kyushu-trip-${currentTripId.value}.json`;
-                    a.click();
-                    URL.revokeObjectURL(url);
-                };
-
-                const importBackupJson = (event) => {
-                    const file = event.target.files[0];
-                    if (!file) return;
-                    const reader = new FileReader();
-                    reader.onload = (e) => {
-                        try {
-                            const data = JSON.parse(e.target.result);
-                            if (data.days) days.value = data.days;
-                            if (data.expenses) expenses.value = data.expenses;
-                            if (data.members) members.value = data.members;
-                            if (data.exchangeRate) exchangeRate.value = data.exchangeRate;
-                            if (data.packingList) packingList.value = data.packingList;
-                            saveDataToCloudAndLocal();
-                            copyNotice.value = "✅ JSON 資料匯入成功！";
-                        } catch (err) {
-                            copyNotice.value = "❌ 檔案格式錯誤！";
-                        }
-                        setTimeout(() => { copyNotice.value = ''; }, 4000);
-                    };
-                    reader.readAsText(file);
                 };
 
                 const setExchangeRate = (rate) => {
@@ -1281,6 +1332,22 @@
                     saveDataToCloudAndLocal();
                 };
 
+                const addPackingItem = () => {
+                    if (!newPackingItemText.value.trim()) return;
+                    packingList.value.push({
+                        text: newPackingItemText.value.trim(),
+                        category: newPackingItemCategory.value,
+                        done: false
+                    });
+                    newPackingItemText.value = '';
+                    saveDataToCloudAndLocal();
+                };
+
+                const removePackingItem = (idx) => {
+                    packingList.value.splice(idx, 1);
+                    saveDataToCloudAndLocal();
+                };
+
                 const speakJapanese = (text) => {
                     if ('speechSynthesis' in window) {
                         window.speechSynthesis.cancel();
@@ -1320,6 +1387,7 @@
                 const itineraryForm = ref({ time: '', type: 'spot', activity: '', location: '', itemNote: '' });
 
                 const openItineraryModal = (item = null, idx = null) => {
+                    if (!checkAuth()) return;
                     if (item && idx !== null) {
                         editingItineraryIdx.value = idx;
                         itineraryForm.value = { ...item };
@@ -1331,6 +1399,7 @@
                 };
 
                 const saveItineraryItem = () => {
+                    if (!checkAuth()) return;
                     if (!itineraryForm.value.activity) return;
                     if (editingItineraryIdx.value !== null) {
                         days.value[currentDayIdx.value].items[editingItineraryIdx.value] = { ...itineraryForm.value };
@@ -1342,11 +1411,13 @@
                 };
 
                 const deleteItineraryItem = (idx) => {
+                    if (!checkAuth()) return;
                     days.value[currentDayIdx.value].items.splice(idx, 1);
                     saveDataToCloudAndLocal();
                 };
 
                 const editDayHotel = () => {
+                    if (!checkAuth()) return;
                     const current = days.value[currentDayIdx.value].hotel;
                     const res = prompt('請輸入此日住宿飯店名稱：', current);
                     if (res !== null) {
@@ -1439,6 +1510,7 @@
                     currentDayWeather, filteredExpenses, getExpenseOriginalIndex,
                     exchangeRate, calcJpyInput, calcTwdResult, totalExpensesTwd, perPersonExpenseTwd,
                     setExchangeRate, packingList, checkedPackingCount, packingProgressPercent, togglePackingItem,
+                    packingCategories, newPackingItemText, newPackingItemCategory, addPackingItem, removePackingItem,
                     japanesePhrases, speakJapanese, copyLineItineraryText, manualSaveData,
                     getCategoryIcon, getCategoryName, getCategoryBgColor, getCategoryBadgeClass,
                     getGoogleNavLink, getExpenseCategoryIcon, moveItineraryItem,
@@ -1446,7 +1518,8 @@
                     showItineraryModal, editingItineraryIdx, itineraryForm, openItineraryModal, saveItineraryItem, deleteItineraryItem, editDayHotel,
                     showExpenseModal, editingExpenseIdx, expenseForm, openExpenseModal, toggleExpenseMember, saveExpense, deleteExpense,
                     showMemberModal, newMemberName, editingMemberIndex, editMemberNameInput, openMemberModal, startEditMember, saveEditMember, addMember, removeMember,
-                    saveDataToCloudAndLocal, showShareModal, currentTripId, tripInputCode, copyNotice, switchTripId, copyShareLink
+                    saveDataToCloudAndLocal, showShareModal, currentTripId, tripInputCode, copyNotice, switchTripId, copyShareLink,
+                    isLoggedIn, showAuthModal, passwordInput, authErrorMsg, handleLogin, handleLogout
                 };
             }
         }).mount('#app')
