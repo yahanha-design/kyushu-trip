@@ -248,7 +248,6 @@
 
         <main class="flex-1 overflow-y-auto relative hide-scroll px-4 pt-3.5 pb-20 bg-slate-100">
             
-            <!-- 1️⃣ 行程表視圖 (Itinerary Tab) -->
             <transition name="fade" mode="out-in">
                 <div v-if="currentTab === 'plan'" :key="currentDayIdx" class="space-y-3.5 relative min-h-full">
                     <div class="grid grid-cols-2 gap-2.5 relative z-10">
@@ -472,21 +471,48 @@
                         </div>
                     </div>
 
-                    <!-- Quick Calculator Bar -->
-                    <div class="bg-indigo-900/90 text-white p-3 rounded-2xl shadow-2xs border border-indigo-700/80 flex items-center justify-between gap-2">
-                        <div class="flex items-center gap-1.5 text-xs font-black text-indigo-200 shrink-0">
-                            <i class="ph-bold ph-calculator text-indigo-300 text-base"></i>
-                            <span>快捷換算</span>
+                    <!-- Enlarged Quick Calculator Bar -->
+                    <div class="bg-indigo-900/95 text-white p-4 rounded-2xl shadow-md border border-indigo-700/80 space-y-2">
+                        <div class="flex items-center justify-between text-xs font-black text-indigo-200">
+                            <span class="flex items-center gap-1.5 text-sm">
+                                <i class="ph-bold ph-calculator text-amber-400 text-lg"></i>
+                                <span>快捷日幣換算機 (Quick Calculator)</span>
+                            </span>
+                            <span class="text-[10px] bg-indigo-800/80 px-2 py-0.5 rounded-md text-indigo-200">即時計算</span>
                         </div>
-                        <div class="flex items-center gap-1.5 flex-1 max-w-[210px] justify-end">
-                            <div class="relative w-24">
-                                <input v-model.number="calcJpyInput" type="number" placeholder="日圓" class="w-full pl-5 pr-1.5 py-1 bg-indigo-950/90 border border-indigo-500/50 rounded-lg text-xs font-black text-white focus:outline-none focus:border-amber-400 text-right">
-                                <span class="absolute left-1.5 top-1 text-xs text-indigo-400 font-black">¥</span>
+                        <div class="flex items-center gap-3 bg-indigo-950 p-3 rounded-xl border border-indigo-600/60">
+                            <div class="relative flex-1">
+                                <input v-model.number="calcJpyInput" type="number" placeholder="輸入日幣金額" class="w-full pl-7 pr-3 py-2 bg-indigo-900/80 border border-indigo-500/60 rounded-xl text-base font-black text-white focus:outline-none focus:border-amber-400">
+                                <span class="absolute left-2.5 top-2.5 text-sm text-amber-300 font-black">¥</span>
                             </div>
-                            <span class="text-xs font-black text-amber-300 shrink-0">≈</span>
-                            <div class="text-xs font-black text-amber-300 bg-indigo-950/90 px-2 py-1 rounded-lg border border-indigo-500/50 shrink-0 min-w-[70px] text-right">
-                                NT$ {{ calcTwdResult.toLocaleString() }}
+                            <span class="text-lg font-black text-amber-300 shrink-0">≈</span>
+                            <div class="flex-1 text-right bg-indigo-900/80 border border-indigo-500/60 rounded-xl px-3 py-2">
+                                <div class="text-[10px] text-indigo-300 font-bold">約合台幣</div>
+                                <div class="text-base font-black text-amber-300">NT$ {{ calcTwdResult.toLocaleString() }}</div>
                             </div>
+                        </div>
+                    </div>
+
+                    <!-- Daily Expense Summary Bar (Clickable to filter) -->
+                    <div class="bg-white p-3 rounded-2xl shadow-2xs border border-slate-200 space-y-2">
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-xs font-black text-slate-900 flex items-center gap-1.5">
+                                <i class="ph-fill ph-calendar text-indigo-600 text-sm"></i>
+                                <span>每日消費合計 (點擊快速篩選清單)</span>
+                            </h3>
+                            <button v-if="selectedExpenseDayFilter !== null" @click="selectedExpenseDayFilter = null" class="text-[10px] bg-slate-100 text-indigo-700 hover:bg-slate-200 font-bold px-2 py-0.5 rounded-lg border border-slate-200 btn-bounce">
+                                顯示全部
+                            </button>
+                        </div>
+                        <div class="flex gap-2 overflow-x-auto hide-scroll py-1">
+                            <button v-for="(day, idx) in days" :key="idx"
+                                    @click="selectedExpenseDayFilter = selectedExpenseDayFilter === idx ? null : idx"
+                                    :class="selectedExpenseDayFilter === idx ? 'bg-indigo-600 text-white border-indigo-600 font-black shadow-xs' : 'bg-slate-50 text-slate-800 border-slate-200 hover:bg-slate-100 font-bold'"
+                                    class="flex flex-col items-center min-w-[72px] p-2 rounded-xl border transition-all shrink-0 btn-bounce">
+                                <span class="text-[10px]" :class="selectedExpenseDayFilter === idx ? 'text-indigo-200' : 'text-slate-500'">Day {{ idx + 1 }}</span>
+                                <span class="text-xs font-black mt-0.5">¥ {{ getDayTotalExpense(idx).toLocaleString() }}</span>
+                                <span class="text-[9px] mt-0.5 truncate max-w-[65px]" :class="selectedExpenseDayFilter === idx ? 'text-indigo-100' : 'text-slate-400'">{{ day.city }}</span>
+                            </button>
                         </div>
                     </div>
 
@@ -520,6 +546,9 @@
                             <h3 class="text-xs font-black text-slate-700 flex items-center gap-1">
                                 <i class="ph-fill ph-receipt text-indigo-600 text-sm"></i> 
                                 消費明細 ({{ filteredExpenses.length }})
+                                <span v-if="selectedExpenseDayFilter !== null" class="text-[10px] text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded border border-indigo-200">
+                                    已篩選 Day {{ selectedExpenseDayFilter + 1 }}
+                                </span>
                             </h3>
                             <button @click="openExpenseModal()" class="text-xs font-black text-amber-700 bg-amber-100 px-2.5 py-1 rounded-lg border border-amber-200 btn-bounce">
                                 + 記一筆
@@ -528,14 +557,18 @@
 
                         <div v-for="(exp, idx) in filteredExpenses" :key="exp.id || idx" class="bg-white p-3 rounded-2xl shadow-2xs border border-slate-200 flex items-center justify-between gap-2">
                             <div class="flex items-center gap-2.5 min-w-0">
-                                <div class="w-9 h-9 rounded-xl bg-slate-100 text-slate-800 border border-slate-200 flex items-center justify-center shrink-0">
-                                    <i :class="getExpenseCategoryIcon(exp.category)" class="text-lg"></i>
+                                <div class="relative shrink-0">
+                                    <div class="w-9 h-9 rounded-xl bg-slate-100 text-slate-800 border border-slate-200 flex items-center justify-center">
+                                        <i :class="getExpenseCategoryIcon(exp.category)" class="text-lg"></i>
+                                    </div>
+                                    <img v-if="exp.photo" :src="exp.photo" @click="openPhotoPreview(exp.photo)" class="absolute -bottom-1 -right-1 w-5 h-5 object-cover rounded-md border-2 border-white shadow-xs cursor-pointer" title="點擊檢視收據照片">
                                 </div>
                                 <div class="min-w-0">
                                     <div class="text-xs font-black text-slate-900 truncate">{{ exp.title }}</div>
                                     <div class="flex items-center gap-1.5 text-[10px] font-bold text-slate-500 mt-0.5">
                                         <span class="bg-indigo-50 text-indigo-800 px-1 py-0.5 rounded border border-indigo-200 font-black">Day {{ (exp.dayIdx !== undefined ? exp.dayIdx : 0) + 1 }}</span>
                                         <span>由 {{ exp.paidBy }} 付款</span>
+                                        <span v-if="exp.photo" class="text-emerald-600 font-bold flex items-center gap-0.5"><i class="ph-bold ph-camera"></i> 有照片</span>
                                     </div>
                                 </div>
                             </div>
@@ -590,7 +623,7 @@
                         </div>
                     </div>
 
-                    <!-- Japanese Travel Voice Phrases (Updated with requested phrases) -->
+                    <!-- Japanese Travel Voice Phrases -->
                     <div class="bg-white p-4 rounded-2xl shadow-2xs border border-slate-200 space-y-3">
                         <div class="flex justify-between items-center pb-2 border-b border-slate-100">
                             <h3 class="text-xs font-black text-slate-900 flex items-center gap-1.5">
@@ -784,7 +817,7 @@
             </div>
         </transition>
 
-        <!-- 💸 Add/Edit Expense Modal -->
+        <!-- 💸 Add/Edit Expense Modal with Photo Upload -->
         <transition name="fade">
             <div v-if="showExpenseModal" class="absolute inset-0 bg-slate-900/50 backdrop-blur-xs z-50 flex items-end justify-center">
                 <div class="bg-white w-full rounded-t-3xl p-5 space-y-3 max-h-[85vh] overflow-y-auto hide-scroll shadow-2xl border-t border-slate-200">
@@ -847,10 +880,47 @@
                                 <option value="ticket">門票/娛樂 🎟️</option>
                             </select>
                         </div>
+
+                        <!-- Expense Photo Upload Option -->
+                        <div>
+                            <label class="text-slate-700 block mb-1">上傳收據或商品照片 (選填)</label>
+                            <div class="flex items-center gap-3">
+                                <label class="cursor-pointer bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-2 rounded-xl border border-slate-300 text-xs flex items-center gap-1.5 btn-bounce shrink-0">
+                                    <i class="ph-bold ph-camera text-sm text-indigo-600"></i>
+                                    <span>選擇相片檔案</span>
+                                    <input type="file" accept="image/*" @change="handleExpensePhotoUpload" class="hidden">
+                                </label>
+                                <div v-if="expenseForm.photo" class="flex items-center gap-2">
+                                    <img :src="expenseForm.photo" class="w-10 h-10 object-cover rounded-xl border border-slate-300">
+                                    <button @click="expenseForm.photo = ''" class="text-red-500 text-[11px] font-bold hover:underline">移除</button>
+                                </div>
+                                <span v-else class="text-[11px] text-slate-400">尚未上傳照片</span>
+                            </div>
+                        </div>
                     </div>
 
                     <button @click="saveExpense()" class="w-full py-3 bg-amber-600 hover:bg-amber-700 text-white font-black text-sm rounded-xl shadow-xs btn-bounce mt-2">
                         儲存帳目
+                    </button>
+                </div>
+            </div>
+        </transition>
+
+        <!-- 📷 Photo Preview Modal -->
+        <transition name="fade">
+            <div v-if="previewPhotoUrl" class="absolute inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4" @click="previewPhotoUrl = null">
+                <div class="relative max-w-sm w-full bg-white rounded-3xl overflow-hidden shadow-2xl p-3 space-y-3" @click.stop>
+                    <div class="flex justify-between items-center pb-1 border-b border-slate-200">
+                        <h3 class="text-xs font-black text-slate-800 flex items-center gap-1">
+                            <i class="ph-bold ph-image text-indigo-600"></i> 收據 / 憑證照片
+                        </h3>
+                        <button @click="previewPhotoUrl = null" class="w-6 h-6 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center font-black">✕</button>
+                    </div>
+                    <div class="w-full max-h-[60vh] flex items-center justify-center bg-slate-900 rounded-2xl overflow-hidden">
+                        <img :src="previewPhotoUrl" class="max-w-full max-h-[60vh] object-contain">
+                    </div>
+                    <button @click="previewPhotoUrl = null" class="w-full py-2 bg-slate-900 text-white text-xs font-black rounded-xl btn-bounce">
+                        關閉預覽
                     </button>
                 </div>
             </div>
@@ -975,8 +1045,6 @@
             }
         ];
 
-        // Updated Japanese phrases with all requested items:
-        // - 請給我菜單, 結帳, 請給我常溫水, 請問有什麼推薦的嗎？, 請給我這個（搭配指菜單）
         const defaultJapanesePhrases = [
             { zh: '不好意思 / 請問...', ja: 'すみません', roma: 'Sumimasen' },
             { zh: '請給我菜單', ja: 'メニューをいただけますか', roma: 'Menū o itadakemasu ka?' },
@@ -1048,10 +1116,18 @@
                 const calcJpyInput = ref(1000);
                 const members = ref(safeParseJSON('kyushu_members', ['小明', '小華', '阿妹']));
                 const expenses = ref(safeParseJSON('kyushu_expenses', [
-                    { id: 1, dayIdx: 3, title: '阿蘇草千里午餐', amount: 12000, paidBy: '小華', splitAmong: ['小明', '小華', '阿妹'], category: 'food' },
-                    { id: 2, dayIdx: 2, title: '別府纜車往返門票', amount: 5400, paidBy: '阿妹', splitAmong: ['小明', '小華'], category: 'ticket' }
+                    { id: 1, dayIdx: 3, title: '阿蘇草千里午餐', amount: 12000, paidBy: '小華', splitAmong: ['小明', '小華', '阿妹'], category: 'food', photo: '' },
+                    { id: 2, dayIdx: 2, title: '別府纜車往返門票', amount: 5400, paidBy: '阿妹', splitAmong: ['小明', '小華'], category: 'ticket', photo: '' }
                 ]));
                 const japanesePhrases = ref(defaultJapanesePhrases);
+
+                // Expense Day Filter State
+                const selectedExpenseDayFilter = ref(null);
+                const previewPhotoUrl = ref(null);
+
+                const openPhotoPreview = (url) => {
+                    previewPhotoUrl.value = url;
+                };
 
                 const syncChannel = new BroadcastChannel('kyushu_trip_channel');
 
@@ -1220,7 +1296,17 @@
 
                 const totalExpenses = computed(() => expenses.value.reduce((sum, item) => sum + (parseFloat(item.amount) || 0), 0));
                 const perPersonExpense = computed(() => members.value.length ? Math.round(totalExpenses.value / members.value.length) : 0);
-                const filteredExpenses = computed(() => expenses.value);
+                
+                const filteredExpenses = computed(() => {
+                    if (selectedExpenseDayFilter.value === null) return expenses.value;
+                    return expenses.value.filter(exp => (exp.dayIdx !== undefined ? exp.dayIdx : 0) === selectedExpenseDayFilter.value);
+                });
+
+                const getDayTotalExpense = (dayIdx) => {
+                    return expenses.value
+                        .filter(exp => (exp.dayIdx !== undefined ? exp.dayIdx : 0) === dayIdx)
+                        .reduce((sum, item) => sum + (parseFloat(item.amount) || 0), 0);
+                };
 
                 const totalExpensesTwd = computed(() => Math.round(totalExpenses.value * exchangeRate.value));
                 const perPersonExpenseTwd = computed(() => Math.round(perPersonExpense.value * exchangeRate.value));
@@ -1340,17 +1426,27 @@
 
                 const showExpenseModal = ref(false);
                 const editingExpenseIdx = ref(null);
-                const expenseForm = ref({ dayIdx: 0, title: '', amount: '', paidBy: members.value[0], splitAmong: [...members.value], category: 'food' });
+                const expenseForm = ref({ dayIdx: 0, title: '', amount: '', paidBy: members.value[0], splitAmong: [...members.value], category: 'food', photo: '' });
 
                 const openExpenseModal = (exp = null, idx = null) => {
                     if (exp && idx !== null && idx >= 0) {
                         editingExpenseIdx.value = idx;
-                        expenseForm.value = { dayIdx: exp.dayIdx || 0, title: exp.title, amount: exp.amount, paidBy: exp.paidBy, splitAmong: [...exp.splitAmong], category: exp.category };
+                        expenseForm.value = { dayIdx: exp.dayIdx || 0, title: exp.title, amount: exp.amount, paidBy: exp.paidBy, splitAmong: [...exp.splitAmong], category: exp.category, photo: exp.photo || '' };
                     } else {
                         editingExpenseIdx.value = null;
-                        expenseForm.value = { dayIdx: currentDayIdx.value, title: '', amount: '', paidBy: members.value[0], splitAmong: [...members.value], category: 'food' };
+                        expenseForm.value = { dayIdx: currentDayIdx.value, title: '', amount: '', paidBy: members.value[0], splitAmong: [...members.value], category: 'food', photo: '' };
                     }
                     showExpenseModal.value = true;
+                };
+
+                const handleExpensePhotoUpload = (e) => {
+                    const file = e.target.files[0];
+                    if (!file) return;
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        expenseForm.value.photo = event.target.result;
+                    };
+                    reader.readAsDataURL(file);
                 };
 
                 const toggleExpenseMember = (m) => {
@@ -1436,13 +1532,15 @@
                     isLoggedIn, showAuthModal, passwordInput, authErrorMsg, handleLogin, handleLogout,
                     exchangeRate, setExchangeRate, calcJpyInput, calcTwdResult, members, expenses,
                     totalExpenses, perPersonExpense, filteredExpenses, totalExpensesTwd, perPersonExpenseTwd,
+                    selectedExpenseDayFilter, getDayTotalExpense,
+                    previewPhotoUrl, openPhotoPreview,
                     getExpenseOriginalIndex, settlements,
                     japanesePhrases, speakJapanese,
                     currentDayWeather, currentDayLocations, currentGoogleMapEmbedUrl, currentGoogleSearchUrl,
                     getCategoryIcon, getCategoryName, getCategoryBgColor, getCategoryBadgeClass, getGoogleNavLink,
                     moveItineraryItem,
                     showItineraryModal, editingItineraryIdx, itineraryForm, openItineraryModal, saveItineraryItem, deleteItineraryItem, editDayHotel,
-                    showExpenseModal, editingExpenseIdx, expenseForm, openExpenseModal, toggleExpenseMember, saveExpense, deleteExpense, getExpenseCategoryIcon,
+                    showExpenseModal, editingExpenseIdx, expenseForm, openExpenseModal, handleExpensePhotoUpload, toggleExpenseMember, saveExpense, deleteExpense, getExpenseCategoryIcon,
                     showMemberModal, newMemberName, openMemberModal, addMember, removeMember, editingMemberIndex, editMemberNameInput, startEditMember, saveEditMember
                 };
             }
